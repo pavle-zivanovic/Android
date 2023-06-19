@@ -62,28 +62,39 @@ class LoginAndSignupViewModel : ViewModel(){
     }
 
     fun createAccount(){
-        val username = "${username.value}"+"@gmail.com"
-        auth.createUserWithEmailAndPassword(username, password.value!!)
-            .addOnCompleteListener() { task ->
-                if(task.isSuccessful){
-                    UploadInfo()
+        if(checkInfo(false)){
+            val username = "${username.value}"+"@gmail.com"
+            auth.createUserWithEmailAndPassword(username, password.value!!)
+                .addOnCompleteListener() { task ->
+                    if(task.isSuccessful){
+                        UploadInfo()
+                    }
+                    else{
+                        Log.d("SIGNUP", "User account is not created.")
+                    }
                 }
-                else{
-                    Log.d("SIGNUP", "User account is not created.")
-                }
-            }
+        }
+        else{
+            Log.d("SIGNUP", "Not all fields are filled.")
+        }
     }
 
-    fun login(username: String, password: String){
-        auth.signInWithEmailAndPassword(username, password)
-            .addOnCompleteListener() { task ->
-                if(task.isSuccessful){
-                    Log.d("LOGIN", "Login success.")
+    fun login(){
+        if(checkInfo(true)){
+            val username = "${username.value}"+"@gmail.com"
+            auth.signInWithEmailAndPassword(username, password.value!!)
+                .addOnCompleteListener() { task ->
+                    if(task.isSuccessful){
+                        Log.d("LOGIN", "Login success.")
+                    }
+                    else{
+                        Log.d("LOGIN", "Login failed.")
+                    }
                 }
-                else{
-                    Log.d("LOGIN", "Login failed.")
-                }
-            }
+        }
+        else{
+            Log.d("LOGIN", "Not all fields are filled.")
+        }
     }
 
     private fun UploadInfo(){
@@ -122,5 +133,41 @@ class LoginAndSignupViewModel : ViewModel(){
                 Log.d("SIGNUP", "User account created.")
             }
         }
+    }
+
+    private fun checkInfo(login: Boolean): Boolean {
+        var checked = true
+
+        if(login){
+            if(username.value == null){
+                checked = false
+            }
+            else if(password.value == null){
+                checked = false
+            }
+        }
+
+        else{
+            if(firstname.value == null){
+                checked = false
+            }
+            else if(lastname.value == null){
+                checked = false
+            }
+            else if(phone.value == null){
+                checked = false
+            }
+            else if(username.value == null){
+                checked = false
+            }
+            else if(password.value == null){
+                checked = false
+            }
+            else if(image.value == null){
+                checked = false
+            }
+        }
+
+        return checked
     }
 }
