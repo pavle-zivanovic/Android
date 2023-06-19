@@ -1,17 +1,23 @@
 package elfak.mosis.housebuilder.models
 
+
+import android.content.Context
 import android.graphics.Bitmap
 import android.text.Editable
 import android.util.Log
+import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import elfak.mosis.housebuilder.R
 import elfak.mosis.housebuilder.models.data.User
 import java.io.ByteArrayOutputStream
 
@@ -61,25 +67,25 @@ class LoginAndSignupViewModel : ViewModel(){
         _phone.value = phone.toString()
     }
 
-    fun createAccount(){
+    fun createAccount(context: Context, fragment: Fragment){
         if(checkInfo(false)){
             val username = "${username.value}"+"@gmail.com"
             auth.createUserWithEmailAndPassword(username, password.value!!)
                 .addOnCompleteListener() { task ->
                     if(task.isSuccessful){
-                        UploadInfo()
+                        UploadInfo(context, fragment)
                     }
                     else{
-                        Log.d("SIGNUP", "User account is not created.")
+                        Toast.makeText(context, "User account is not created.", Toast.LENGTH_SHORT).show()
                     }
                 }
         }
         else{
-            Log.d("SIGNUP", "Not all fields are filled.")
+            Toast.makeText(context, "Not all fields are filled!", Toast.LENGTH_SHORT).show()
         }
     }
 
-    fun login(){
+    fun login(context: Context){
         if(checkInfo(true)){
             val username = "${username.value}"+"@gmail.com"
             auth.signInWithEmailAndPassword(username, password.value!!)
@@ -88,19 +94,19 @@ class LoginAndSignupViewModel : ViewModel(){
                         Log.d("LOGIN", "Login success.")
                     }
                     else{
-                        Log.d("LOGIN", "Login failed.")
+                        Toast.makeText(context, "Login failed.", Toast.LENGTH_SHORT).show()
                     }
                 }
         }
         else{
-            Log.d("LOGIN", "Not all fields are filled.")
+            Toast.makeText(context, "Not all fields are filled!", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun UploadInfo(){
+    private fun UploadInfo(context: Context, fragment: Fragment){
         val userID: String = auth.currentUser?.uid ?: ""
         if(userID == ""){
-            Log.w("warning", "Greska!")
+            Log.w("UerID", "Error!")
         }
 
         var storage = Firebase.storage
@@ -131,6 +137,7 @@ class LoginAndSignupViewModel : ViewModel(){
                 val database = Firebase.database("https://house-builder-7dd6e-default-rtdb.firebaseio.com/")
                 database.reference.child("users").child(userID).setValue(user)
                 Log.d("SIGNUP", "User account created.")
+                findNavController(fragment).navigate(R.id.action_SignupFragment_to_LoginFragment)
             }
         }
     }

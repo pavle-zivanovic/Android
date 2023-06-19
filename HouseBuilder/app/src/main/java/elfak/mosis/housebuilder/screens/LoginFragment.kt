@@ -37,7 +37,7 @@ class LoginFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.userViewModel = userViewModel
 
-        binding.buttonLogin.setOnClickListener{userViewModel.login()}
+        binding.buttonLogin.setOnClickListener{userViewModel.login(requireActivity().applicationContext)}
         binding.buttonSignup.setOnClickListener{findNavController().navigate(R.id.action_LoginFragment_to_SignupFragment)}
     }
 

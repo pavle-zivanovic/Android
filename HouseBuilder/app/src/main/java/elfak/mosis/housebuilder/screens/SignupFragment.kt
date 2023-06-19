@@ -43,7 +43,7 @@ class SignupFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.userViewModel = userViewModel
 
-        binding.buttonSignup.setOnClickListener{userViewModel.createAccount()}
+        binding.buttonSignup.setOnClickListener{userViewModel.createAccount(requireActivity().applicationContext, this)}
         binding.buttonLogin.setOnClickListener{findNavController().navigate(R.id.action_SignupFragment_to_LoginFragment)}
         binding.buttonAddpicture.setOnClickListener{chooseImage()}
     }
@@ -73,5 +73,4 @@ class SignupFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }
