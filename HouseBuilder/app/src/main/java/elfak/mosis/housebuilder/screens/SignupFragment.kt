@@ -9,11 +9,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import elfak.mosis.housebuilder.R
+import elfak.mosis.housebuilder.activities.MainActivity
 import elfak.mosis.housebuilder.databinding.FragmentSignupBinding
+import elfak.mosis.housebuilder.helpers.ActionState
 import elfak.mosis.housebuilder.models.LoginAndSignupViewModel
 
 class SignupFragment : Fragment() {
@@ -43,9 +47,11 @@ class SignupFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.userViewModel = userViewModel
 
-        binding.buttonSignup.setOnClickListener{userViewModel.createAccount(requireActivity().applicationContext, this)}
+        binding.buttonSignup.setOnClickListener{userViewModel.createAccount()}
         binding.buttonLogin.setOnClickListener{findNavController().navigate(R.id.action_SignupFragment_to_LoginFragment)}
         binding.buttonAddpicture.setOnClickListener{chooseImage()}
+
+        checkActionState()
     }
 
     private fun chooseImage(){
@@ -67,6 +73,20 @@ class SignupFragment : Fragment() {
                 userViewModel.setImage(bitmap)
             }
         }
+    }
+
+    private fun checkActionState(){
+        val actionState = Observer<ActionState> { state ->
+            if(state == ActionState.Success){
+                val i: Intent = Intent(activity, MainActivity::class.java)
+                startActivity(i)
+                activity?.finish()
+            }
+            else if(state is ActionState.ActionError){
+                Toast.makeText(view?.context, state.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+        userViewModel.actionState.observe(viewLifecycleOwner, actionState)
     }
 
     override fun onDestroyView() {

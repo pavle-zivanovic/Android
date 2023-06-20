@@ -1,15 +1,20 @@
 package elfak.mosis.housebuilder.screens
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import elfak.mosis.housebuilder.R
+import elfak.mosis.housebuilder.activities.MainActivity
 import elfak.mosis.housebuilder.databinding.FragmentLoginBinding
+import elfak.mosis.housebuilder.helpers.ActionState
 import elfak.mosis.housebuilder.models.LoginAndSignupViewModel
 
 class LoginFragment : Fragment() {
@@ -37,8 +42,24 @@ class LoginFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.userViewModel = userViewModel
 
-        binding.buttonLogin.setOnClickListener{userViewModel.login(requireActivity().applicationContext)}
+        binding.buttonLogin.setOnClickListener{userViewModel.login()}
         binding.buttonSignup.setOnClickListener{findNavController().navigate(R.id.action_LoginFragment_to_SignupFragment)}
+
+        checkActionState()
+    }
+
+    private fun checkActionState(){
+        val actionState = Observer<ActionState> { state ->
+            if(state == ActionState.Success){
+                val i: Intent = Intent(activity, MainActivity::class.java)
+                startActivity(i)
+                activity?.finish()
+            }
+            else if(state is ActionState.ActionError){
+                Toast.makeText(view?.context, state.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+        userViewModel.actionState.observe(viewLifecycleOwner, actionState)
     }
 
     override fun onDestroyView() {

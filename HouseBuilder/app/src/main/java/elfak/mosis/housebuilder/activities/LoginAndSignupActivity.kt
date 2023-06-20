@@ -1,5 +1,6 @@
 package elfak.mosis.housebuilder.activities
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -20,11 +21,11 @@ class LoginAndSignupActivity : AppCompatActivity() {
     override fun onStart(){
         super.onStart()
         val currentUser = auth.currentUser
-        /*if(currentUser != null){
+        if(currentUser != null){
             val i: Intent = Intent(this, MainActivity::class.java)
             startActivity(i)
             finish()
-        }*/
+        }
     }
 
     override fun onDestroy() {

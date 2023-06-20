@@ -11,4 +11,11 @@
     <string name="input_last_name">Last Name</string>
     <string name="input_phone_number">Phone Number</string>
     <string name="profile_picture_description">profile picture</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_edit_profile">Edit profile</string>
+    <string name="nav_logout">Logout</string>
+    <string name="nav_text_house_builder">House Builder</string>
+    <string name="nav_home">Home</string>
+    <string name="open_nav">Open Navigation Drawer</string>
+    <string name="close_nav">Close Navigation Drawer</string>
 </resources>

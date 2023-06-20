@@ -1,23 +1,19 @@
 package elfak.mosis.housebuilder.models
 
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.text.Editable
 import android.util.Log
-import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
-import elfak.mosis.housebuilder.R
+import elfak.mosis.housebuilder.helpers.ActionState
 import elfak.mosis.housebuilder.models.data.User
 import java.io.ByteArrayOutputStream
 
@@ -43,6 +39,9 @@ class LoginAndSignupViewModel : ViewModel(){
     private val _phone = MutableLiveData<String>()
     val phone : LiveData<String> = _phone
 
+    private val _actionState = MutableLiveData<ActionState>(ActionState.Idle)
+    val actionState: LiveData<ActionState> = _actionState
+
     fun setImage(image: Bitmap){
         _image.value = image
     }
@@ -67,43 +66,37 @@ class LoginAndSignupViewModel : ViewModel(){
         _phone.value = phone.toString()
     }
 
-    fun createAccount(context: Context, fragment: Fragment){
+    fun createAccount(){
         if(checkInfo(false)){
             val username = "${username.value}"+"@gmail.com"
             auth.createUserWithEmailAndPassword(username, password.value!!)
                 .addOnCompleteListener() { task ->
                     if(task.isSuccessful){
-                        UploadInfo(context, fragment)
+                        UploadInfo()
                     }
                     else{
-                        Toast.makeText(context, "User account is not created.", Toast.LENGTH_SHORT).show()
+                        _actionState.value = ActionState.ActionError("User account is not created.")
                     }
                 }
         }
-        else{
-            Toast.makeText(context, "Not all fields are filled!", Toast.LENGTH_SHORT).show()
-        }
     }
 
-    fun login(context: Context){
+    fun login(){
         if(checkInfo(true)){
             val username = "${username.value}"+"@gmail.com"
             auth.signInWithEmailAndPassword(username, password.value!!)
                 .addOnCompleteListener() { task ->
                     if(task.isSuccessful){
-                        Log.d("LOGIN", "Login success.")
+                        _actionState.value = ActionState.Success
                     }
                     else{
-                        Toast.makeText(context, "Login failed.", Toast.LENGTH_SHORT).show()
+                        _actionState.value = ActionState.ActionError("Login failed.")
                     }
                 }
         }
-        else{
-            Toast.makeText(context, "Not all fields are filled!", Toast.LENGTH_SHORT).show()
-        }
     }
 
-    private fun UploadInfo(context: Context, fragment: Fragment){
+    private fun UploadInfo(){
         val userID: String = auth.currentUser?.uid ?: ""
         if(userID == ""){
             Log.w("UerID", "Error!")
@@ -127,6 +120,7 @@ class LoginAndSignupViewModel : ViewModel(){
                                 Log.d("SIGNUP", "User account deleted.")
                             }
                         }
+                    _actionState.value = ActionState.ActionError("Upload image error: ${it.message}")
                 }
             }
             imageRef.downloadUrl
@@ -136,8 +130,6 @@ class LoginAndSignupViewModel : ViewModel(){
                 val user = User(username.value, password.value, firstname.value, lastname.value, phone.value, imageUrl)
                 val database = Firebase.database("https://house-builder-7dd6e-default-rtdb.firebaseio.com/")
                 database.reference.child("users").child(userID).setValue(user)
-                Log.d("SIGNUP", "User account created.")
-                findNavController(fragment).navigate(R.id.action_SignupFragment_to_LoginFragment)
             }
         }
     }
@@ -146,35 +138,46 @@ class LoginAndSignupViewModel : ViewModel(){
         var checked = true
 
         if(login){
-            if(username.value == null){
+            if(username.value == null || username.value == ""){
+                _actionState.value = ActionState.ActionError("Enter Username!")
                 checked = false
             }
-            else if(password.value == null){
+            else if(password.value == null || password.value == ""){
+                _actionState.value = ActionState.ActionError("Enter Password!")
                 checked = false
             }
         }
 
         else{
-            if(firstname.value == null){
+            if(firstname.value == null || firstname.value == ""){
+                _actionState.value = ActionState.ActionError("Enter First Name!")
                 checked = false
             }
-            else if(lastname.value == null){
+            else if(lastname.value == null || lastname.value == ""){
+                _actionState.value = ActionState.ActionError("Enter Last Name!")
                 checked = false
             }
-            else if(phone.value == null){
+            else if(phone.value == null || phone.value == ""){
+                _actionState.value = ActionState.ActionError("Enter Phone Number!")
                 checked = false
             }
-            else if(username.value == null){
+            else if(username.value == null || username.value == ""){
+                _actionState.value = ActionState.ActionError("Enter Username!")
                 checked = false
             }
-            else if(password.value == null){
+            else if(password.value == null || password.value == ""){
+                _actionState.value = ActionState.ActionError("Enter Password!")
                 checked = false
             }
             else if(image.value == null){
+                _actionState.value = ActionState.ActionError("Upload Image!")
                 checked = false
             }
         }
 
+        if(checked && !login){
+            _actionState.value = ActionState.Success
+        }
         return checked
     }
 }
