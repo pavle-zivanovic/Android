@@ -30,5 +30,6 @@ class LoginAndSignupActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        auth.signOut()
     }
 }

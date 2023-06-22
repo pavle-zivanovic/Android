@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -19,12 +21,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var auth : FirebaseAuth
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         auth = Firebase.auth
 
+        navController = findNavController(R.id.nav_host_fragment_content_loginandsignup)
         drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -40,9 +44,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.nav_home -> Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show()
+            R.id.nav_home -> navController.navigate(R.id.HomeFragment)
             R.id.nav_editProfile -> Toast.makeText(this, "Edit profile", Toast.LENGTH_SHORT).show()
-            R.id.nav_map -> Toast.makeText(this, "Map", Toast.LENGTH_SHORT).show()
+            R.id.nav_map -> navController.navigate(R.id.MapFragment)
             R.id.nav_logout -> {
                 auth.signOut()
                 val i: Intent = Intent(this, LoginAndSignupActivity::class.java)

@@ -12,4 +12,11 @@
         tools:layout="@layout/fragment_home">
     </fragment>
 
+    <fragment
+        android:id="@+id/MapFragment"
+        android:name="elfak.mosis.housebuilder.screens.MapFragment"
+        android:label="fragment_map"
+        tools:layout="@layout/fragment_map">
+    </fragment>
+
 </navigation>
