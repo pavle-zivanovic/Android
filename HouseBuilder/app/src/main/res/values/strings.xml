@@ -18,4 +18,10 @@
     <string name="nav_home">Home</string>
     <string name="open_nav">Open Navigation Drawer</string>
     <string name="close_nav">Close Navigation Drawer</string>
+    <string name="button_post">Post</string>
+    <string name="dialog_name">Post item</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="spinner_hint">Item</string>
+    <string name="button_get_received_items">See items</string>
+    <string name="nav_add_item">Add item</string>
 </resources>

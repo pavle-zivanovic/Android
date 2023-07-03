@@ -19,4 +19,18 @@
         tools:layout="@layout/fragment_map">
     </fragment>
 
+    <fragment
+        android:id="@+id/AddFragment"
+        android:name="elfak.mosis.housebuilder.screens.AddFragment"
+        android:label="fragment_add"
+        tools:layout="@layout/fragment_add">
+    </fragment>
+
+    <fragment
+        android:id="@+id/EditProfileFragment"
+        android:name="elfak.mosis.housebuilder.screens.EditProfileFragment"
+        android:label="fragment_edit_profile"
+        tools:layout="@layout/fragment_edit_profile">
+    </fragment>
+
 </navigation>

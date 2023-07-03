@@ -3,7 +3,6 @@ package elfak.mosis.housebuilder.activities
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -45,8 +44,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.nav_home -> navController.navigate(R.id.HomeFragment)
-            R.id.nav_editProfile -> Toast.makeText(this, "Edit profile", Toast.LENGTH_SHORT).show()
             R.id.nav_map -> navController.navigate(R.id.MapFragment)
+            R.id.nav_addItem -> navController.navigate(R.id.AddFragment)
+            R.id.nav_editProfile -> navController.navigate(R.id.EditProfileFragment)
             R.id.nav_logout -> {
                 auth.signOut()
                 val i: Intent = Intent(this, LoginAndSignupActivity::class.java)

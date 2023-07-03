@@ -12,8 +12,11 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import elfak.mosis.housebuilder.R
 import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
@@ -40,6 +43,7 @@ class MapFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         map = requireView().findViewById(R.id.map)
+        map.setTileSource(TileSourceFactory.MAPNIK)
         var ctx: Context? = requireActivity().applicationContext
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences((ctx!!)))
 
@@ -57,6 +61,17 @@ class MapFragment : Fragment() {
         map.controller.setZoom(15.0)
         val startPoint = GeoPoint(43.3209, 21.8958)
         map.controller.setCenter(startPoint)
+
+        val mRotationGestureOverlay = RotationGestureOverlay(context, map)
+        mRotationGestureOverlay.setEnabled(true)
+        map.setMultiTouchControls(true)
+        map.getOverlays().add(mRotationGestureOverlay)
+
+        val startMarker = Marker(map)
+        startMarker.position = startPoint
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        map.overlays.add(startMarker)
+        startMarker.title = "Start point";
     }
 
     private fun setMyLoactionOverlay(){
