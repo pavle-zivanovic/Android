@@ -17,6 +17,10 @@
         android:name="elfak.mosis.housebuilder.screens.MapFragment"
         android:label="fragment_map"
         tools:layout="@layout/fragment_map">
+        <action
+            android:id="@+id/action_MapFragment_to_AddFragment"
+            app:destination="@+id/AddFragment">
+        </action>
     </fragment>
 
     <fragment
@@ -24,6 +28,10 @@
         android:name="elfak.mosis.housebuilder.screens.AddFragment"
         android:label="fragment_add"
         tools:layout="@layout/fragment_add">
+        <action
+            android:id="@+id/action_AddFragment_to_MapFragment"
+            app:destination="@+id/MapFragment">
+        </action>
     </fragment>
 
     <fragment

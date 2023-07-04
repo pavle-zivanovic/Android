@@ -45,7 +45,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         when(item.itemId){
             R.id.nav_home -> navController.navigate(R.id.HomeFragment)
             R.id.nav_map -> navController.navigate(R.id.MapFragment)
-            R.id.nav_addItem -> navController.navigate(R.id.AddFragment)
             R.id.nav_editProfile -> navController.navigate(R.id.EditProfileFragment)
             R.id.nav_logout -> {
                 auth.signOut()

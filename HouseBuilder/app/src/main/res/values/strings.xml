@@ -24,4 +24,5 @@
     <string name="spinner_hint">Item</string>
     <string name="button_get_received_items">See items</string>
     <string name="nav_add_item">Add item</string>
+    <string name="fab_content_description">add item</string>
 </resources>

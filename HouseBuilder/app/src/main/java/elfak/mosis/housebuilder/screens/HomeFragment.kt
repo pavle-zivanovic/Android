@@ -13,7 +13,7 @@ import elfak.mosis.housebuilder.R
 
 class HomeFragment : Fragment() {
 
-    private var auth : FirebaseAuth = Firebase.auth
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,8 +30,8 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        auth = Firebase.auth
         val welcomeText: TextView = requireView().findViewById(R.id.welcome_textView)
         welcomeText.text = auth.currentUser?.email?.substringBefore("@")
-
     }
 }
