@@ -27,4 +27,8 @@ class LoginAndSignupActivity : AppCompatActivity() {
             finish()
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+    }
 }

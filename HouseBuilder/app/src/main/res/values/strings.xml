@@ -3,6 +3,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="add_picture">Add picture</string>
+    <string name="change_picture">Change picture</string>
     <string name="input_password">Password</string>
     <string name="input_username">Username</string>
     <string name="button_login">Login</string>
@@ -19,10 +20,15 @@
     <string name="open_nav">Open Navigation Drawer</string>
     <string name="close_nav">Close Navigation Drawer</string>
     <string name="button_post">Post</string>
+    <string name="button_post_land">Post the item</string>
     <string name="dialog_name">Post item</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="spinner_hint">Item</string>
     <string name="button_get_received_items">See items</string>
     <string name="nav_add_item">Add item</string>
     <string name="fab_content_description">add item</string>
+    <string name="button_collect">Collect</string>
+    <string name="button_change_username">Change username</string>
+    <string name="button_change_password">Change password</string>
+    <string name="add_item">Add item</string>
 </resources>

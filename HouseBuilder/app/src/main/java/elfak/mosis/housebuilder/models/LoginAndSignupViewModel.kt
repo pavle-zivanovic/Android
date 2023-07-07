@@ -155,6 +155,84 @@ class LoginAndSignupViewModel : ViewModel(){
         }
     }
 
+    fun updateUsername(){
+        if(checkUsername()){
+            val user = Firebase.auth.currentUser
+            val userID: String = auth.currentUser?.uid ?: ""
+            val userName = "${username.value}"+"@gmail.com"
+            user!!.updateEmail(userName)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        _actionState.value = ActionState.Success
+                        val database = Firebase.database("https://house-builder-7dd6e-default-rtdb.firebaseio.com/")
+                        database.reference.child("users").child(userID).child("username").setValue(username.value)
+                    }
+                    else{
+                        _actionState.value = ActionState.ActionError("Username update failed.")
+                    }
+                }
+        }
+    }
+
+    fun updatePassword(){
+        if(checkPassword()){
+            val user = Firebase.auth.currentUser
+            val userID: String = auth.currentUser?.uid ?: ""
+            user!!.updatePassword(password.value!!)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        _actionState.value = ActionState.Success
+                        val database = Firebase.database("https://house-builder-7dd6e-default-rtdb.firebaseio.com/")
+                        database.reference.child("users").child(userID).child("password").setValue(password.value)
+                    }
+                    else{
+                        _actionState.value = ActionState.ActionError("Password update failed.")
+                    }
+                }
+        }
+    }
+
+    fun updateImage(){
+        val userID: String = auth.currentUser?.uid ?: ""
+        val storage = Firebase.storage
+        val imageRef: StorageReference? = storage.reference.child("users").child(userID).child("${username.value}.jpg")
+        val baos = ByteArrayOutputStream()
+        val bitmap = image.value
+        bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val data = baos.toByteArray()
+        val uploadTask = imageRef!!.putBytes(data)
+        val urlTask = uploadTask.continueWithTask{ task ->
+            if(task.isSuccessful) {
+                _actionState.value = ActionState.Success
+            }
+            imageRef.downloadUrl
+        }.addOnCompleteListener{ task->
+            if(task.isSuccessful){
+                val imageUrl = task.result.toString()
+                Firebase.database("https://house-builder-7dd6e-default-rtdb.firebaseio.com/")
+                .reference.child("users").child(userID).child("image").setValue(imageUrl)
+            }
+        }
+    }
+
+    private fun checkUsername(): Boolean{
+        var checked = true
+        if(username.value == null || username.value == ""){
+            _actionState.value = ActionState.ActionError("Enter new username!")
+            checked = false
+        }
+        return checked
+    }
+
+    private fun checkPassword(): Boolean{
+        var checked = true
+        if(password.value == null || password.value == ""){
+            _actionState.value = ActionState.ActionError("Enter new password!")
+            checked = false
+        }
+        return checked
+    }
+
     private fun checkInfo(login: Boolean): Boolean {
         var checked = true
 

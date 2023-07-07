@@ -1,18 +1,20 @@
 package elfak.mosis.housebuilder.screens
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
-import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
@@ -25,7 +27,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class AddFragment : Fragment() {
+class AddFragment : DialogFragment() {
 
     private var auth: FirebaseAuth = Firebase.auth
     private var db = Firebase.firestore
@@ -50,8 +52,18 @@ class AddFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         getReceivedItems()
 
-        val postBtn: Button = requireView().findViewById<Button>(R.id.button_post)
+        val postBtn: Button = requireView().findViewById(R.id.button_post)
         postBtn.setOnClickListener{postItem()}
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
+            dialog?.window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        }
+        else{
+            dialog?.window?.setLayout(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        }
     }
 
     private fun getReceivedItems() {
@@ -85,8 +97,16 @@ class AddFragment : Fragment() {
                     val adapter = ArrayAdapter(requireView().context, android.R.layout.simple_spinner_dropdown_item, names as List<Any?>)
                     spinner.setAdapter(adapter)
                     spinner.setOnItemClickListener { adapterview, view, i, l ->
+                        val txtInputLayoutSpinner: TextInputLayout = requireView().findViewById(R.id.textInputLayoutSpinner)
                         itemName = adapterview.getItemAtPosition(i).toString()
-                        Toast.makeText(requireView().context, adapterview.getItemAtPosition(i).toString(), Toast.LENGTH_SHORT).show()
+                        when(itemName){
+                            "concrete" -> txtInputLayoutSpinner.setStartIconDrawable(R.drawable.baseline_concrete)
+                            "brick" -> txtInputLayoutSpinner.setStartIconDrawable(R.drawable.baseline_brick)
+                            "door" -> txtInputLayoutSpinner.setStartIconDrawable(R.drawable.baseline_door)
+                            "window" ->txtInputLayoutSpinner.setStartIconDrawable(R.drawable.baseline_window)
+                            "roof" -> txtInputLayoutSpinner.setStartIconDrawable(R.drawable.baseline_roof)
+                            "chimney" -> txtInputLayoutSpinner.setStartIconDrawable(R.drawable.baseline_chimney)
+                        }
                     }
                 }
             }

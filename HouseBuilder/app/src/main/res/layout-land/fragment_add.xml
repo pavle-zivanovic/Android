@@ -12,9 +12,9 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingLeft="50dp"
-        android:paddingTop="150dp"
-        android:paddingRight="50dp"
+        android:paddingLeft="80dp"
+        android:paddingTop="80dp"
+        android:paddingRight="80dp"
         android:paddingBottom="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -43,11 +43,12 @@
 
         <Button
             android:id="@+id/button_post"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="50dp"
             android:background="@drawable/orange_button_color"
-            android:text="@string/button_post" />
+            android:text="@string/button_post_land"
+            android:maxLines="1"/>
 
     </LinearLayout>
 

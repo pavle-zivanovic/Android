@@ -5,21 +5,15 @@
     android:layout_height="176dp"
     android:gravity="center"
     android:paddingTop="26dp"
-    android:background="#c1e8ff">
+    android:background="@drawable/house">
 
     <TextView
-        android:layout_width="70sp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="5sp"
-        android:textSize="20sp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="50sp"
+        android:textAlignment="center"
         android:text="@string/nav_text_house_builder"
         android:textColor="#f79256"
         android:textStyle="bold"/>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:contentDescription="@string/app_name"
-        android:src="@mipmap/ic_launcher" />
 
 </LinearLayout>

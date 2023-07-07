@@ -18,7 +18,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
@@ -26,6 +25,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import elfak.mosis.housebuilder.R
+import elfak.mosis.housebuilder.helpers.CustomInfoWindow
 import elfak.mosis.housebuilder.models.LocationViewModel
 import elfak.mosis.housebuilder.models.data.MarkerItem
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +41,6 @@ import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.time.LocalDateTime
-
 
 class MapFragment : Fragment() {
 
@@ -60,9 +59,7 @@ class MapFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view =  inflater.inflate(R.layout.fragment_map, container, false)
-
-        return view
+        return inflater.inflate(R.layout.fragment_map, container, false)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -72,7 +69,7 @@ class MapFragment : Fragment() {
         getAllMarkers()
         map = requireView().findViewById(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)
-        var ctx: Context? = requireActivity().applicationContext
+        val ctx: Context? = requireActivity().applicationContext
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences((ctx!!)))
 
         map.setMultiTouchControls(true)
@@ -91,9 +88,9 @@ class MapFragment : Fragment() {
         map.controller.setCenter(startPoint)
 
         val mRotationGestureOverlay = RotationGestureOverlay(context, map)
-        mRotationGestureOverlay.setEnabled(true)
+        mRotationGestureOverlay.isEnabled = true
         map.setMultiTouchControls(true)
-        map.getOverlays().add(mRotationGestureOverlay)
+        map.overlays.add(mRotationGestureOverlay)
 
         val fab: FloatingActionButton = requireView().findViewById<FloatingActionButton>(R.id.fab_add)
         fab.setOnClickListener{addItem()}
@@ -109,6 +106,8 @@ class MapFragment : Fragment() {
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 map.overlays.add(marker)
                 marker.title = locationViewModel.itemName.value
+                marker.snippet = locationViewModel.points.toString() + " points"
+                marker.icon = ResourcesCompat.getDrawable(resources, R.drawable.marker_icon, null)
 
                 var drawableImage: Int? = null
                 when(locationViewModel.itemName.value){
@@ -122,6 +121,8 @@ class MapFragment : Fragment() {
                 val image: Drawable? = ResourcesCompat.getDrawable(resources, drawableImage!!, null)
                 marker.image = image
 
+                marker.setInfoWindow(CustomInfoWindow(map))
+
                 val m = MarkerItem(locationViewModel.itemName.value,
                     locationViewModel.longitude.value,
                     locationViewModel.latitude.value,
@@ -132,7 +133,6 @@ class MapFragment : Fragment() {
                 db.collection("markers").add(m)
                 locationViewModel.setItemName("no")
             }
-
         }
         locationViewModel.itemName.observe(viewLifecycleOwner, nameObserver)
     }
@@ -154,9 +154,11 @@ class MapFragment : Fragment() {
                         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         map.overlays.add(marker)
                         marker.title = d.get("name").toString()
+                        marker.snippet = d.get("points").toString() + " points"
+                        marker.icon = ResourcesCompat.getDrawable(resources, R.drawable.marker_icon, null)
 
                         var drawableImage: Int? = null
-                        when(locationViewModel.itemName.value){
+                        when(d.get("name").toString()){
                             "concrete" -> drawableImage = R.drawable.concrete
                             "brick" -> drawableImage = R.drawable.brick
                             "door" -> drawableImage = R.drawable.door
@@ -166,6 +168,9 @@ class MapFragment : Fragment() {
                         }
                         val image: Drawable? = ResourcesCompat.getDrawable(resources, drawableImage!!, null)
                         marker.image = image
+
+                        marker.setInfoWindow(CustomInfoWindow(map))
+                       // Log.d("MARKER", marker.toString())
                     }
                 }
             }
@@ -179,10 +184,10 @@ class MapFragment : Fragment() {
         val loc = myLocationOverlay.myLocation
         if(loc != null){
             locationViewModel.setLocation(loc.longitude.toString(), loc.latitude.toString())
-            findNavController().navigate(R.id.action_MapFragment_to_AddFragment)
+            AddFragment().show(childFragmentManager, "Add item dialog")
         }
         else{
-            Toast.makeText(view?.context, "Turn on location", Toast.LENGTH_SHORT).show()
+            Toast.makeText(view?.context, "Turn on location!", Toast.LENGTH_SHORT).show()
         }
     }
 

@@ -28,6 +28,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:src="@drawable/baseline_add_black"
             android:backgroundTint="#F79256"
+            app:backgroundTint="#F79256"
             android:layout_margin="10dp"
             android:contentDescription="@string/fab_content_description" />
 

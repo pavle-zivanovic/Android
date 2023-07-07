@@ -65,4 +65,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             onBackPressedDispatcher.onBackPressed()
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+    }
 }
