@@ -11,11 +11,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -71,7 +71,7 @@ class EditProfileFragment : Fragment() {
                 binding.inputPhone.text = user?.phone?.toEditable()
                 binding.inputUsername.text = user?.username?.substringBefore("@")?.toEditable()
                 binding.inputPassword.text = user?.password?.toEditable()
-                binding.changeImage.setImageURI(user?.image?.toUri())
+                Glide.with(view.context).load(user?.image).into(binding.changeImage)
             }
             override fun onCancelled(error: DatabaseError) {}
         }
@@ -87,8 +87,8 @@ class EditProfileFragment : Fragment() {
 
     private fun chooseImage(){
         val i: Intent = Intent()
-        i.setType("image/*")
-        i.setAction(Intent.ACTION_GET_CONTENT)
+        i.type = "image/*"
+        i.action = Intent.ACTION_GET_CONTENT
         startActivityForResult(Intent.createChooser(i, "Add picture"), SELECT_PICTURE)
     }
 

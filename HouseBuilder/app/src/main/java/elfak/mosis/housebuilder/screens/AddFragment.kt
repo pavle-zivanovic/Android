@@ -80,7 +80,6 @@ class AddFragment : DialogFragment() {
                 if(result != null) {
                     for(d in result.documents){
                         val item = Item(d.get("name").toString(),
-                            d.get("image").toString(),
                             d.get("points").toString().toInt(),
                             d.get("longitude").toString(),
                             d.get("latitude").toString(),
@@ -131,23 +130,26 @@ class AddFragment : DialogFragment() {
                 if(result != null){
                     val itemId = result.documents[0].id
                     val item = Item(result.documents[0].get("name").toString(),
-                        result.documents[0].get("image").toString(),
                         result.documents[0].get("points").toString().toInt(),
                         result.documents[0].get("longitude").toString(),
                         result.documents[0].get("latitude").toString(),
                         result.documents[0].get("userID").toString())
 
                     db.collection("receivedItems").document(itemId).delete()
+                        .addOnSuccessListener { Log.d("ITEM", "Successfully deleted from receivedItems") }
+                        .addOnFailureListener{ Log.d("ITEM", "Failed to delete in receivedItems") }
 
                     item.longitude = locationViewModel.longitude.value
                     item.latitude = locationViewModel.latitude.value
 
                     db.collection("postedItems").add(item)
+                        .addOnSuccessListener { Log.d("ITEM", "Success writing into postedItems") }
+                        .addOnFailureListener{ Log.d("ITEM", "Fail writing into postedItems") }
 
                     item.points?.let { locationViewModel.setPoints(it) }
                     item.name?.let { locationViewModel.setItemName(it) }
 
-                    findNavController().navigate(R.id.action_AddFragment_to_MapFragment)
+                    findNavController().navigate(R.id.MapFragment)
                 }
             }
             catch (e: Exception) {

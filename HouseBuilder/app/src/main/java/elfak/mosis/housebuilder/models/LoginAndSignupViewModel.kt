@@ -75,12 +75,12 @@ class LoginAndSignupViewModel : ViewModel(){
         var item: Item? = null
         for(i in 1..100){
             when(names.random()){
-                "concrete" -> item =  Item("concrete", "https://firebasestorage.googleapis.com/v0/b/house-builder-7dd6e.appspot.com/o/concrete.jpg?alt=media&token=df76c2f8-90e1-4339-9975-e7f53e3e3f88", 5, null, null, userID)
-                "brick" -> item =  Item("brick", "https://firebasestorage.googleapis.com/v0/b/house-builder-7dd6e.appspot.com/o/brick.jpg?alt=media&token=af98cb4e-8662-4aee-a18e-4cfc4ea057f7", 10, null, null, userID)
-                "door" -> item =  Item("door", "https://firebasestorage.googleapis.com/v0/b/house-builder-7dd6e.appspot.com/o/door.jpg?alt=media&token=ace2e5ff-c1c5-40da-99f4-cae29881485e", 20, null, null, userID)
-                "window" -> item =  Item("window", "https://firebasestorage.googleapis.com/v0/b/house-builder-7dd6e.appspot.com/o/window.jpg?alt=media&token=70adef01-2b75-433c-9c25-c18cd8a6f02e", 15, null, null, userID)
-                "roof" -> item =  Item("roof", "https://firebasestorage.googleapis.com/v0/b/house-builder-7dd6e.appspot.com/o/roof.jpg?alt=media&token=ecd639d0-a601-4da3-bd89-8a4504d6d9d2", 15, null, null, userID)
-                "chimney" -> item =  Item("chimney", "https://firebasestorage.googleapis.com/v0/b/house-builder-7dd6e.appspot.com/o/chimney.jpg?alt=media&token=af2888bb-c6a1-432c-b1ab-efd1b6703ff0", 25, null, null, userID)
+                "concrete" -> item =  Item("concrete",5, null, null, userID)
+                "brick" -> item =  Item("brick",10, null, null, userID)
+                "door" -> item =  Item("door",20, null, null, userID)
+                "window" -> item =  Item("window",15, null, null, userID)
+                "roof" -> item =  Item("roof",15, null, null, userID)
+                "chimney" -> item =  Item("chimney",25, null, null, userID)
             }
             db.collection("receivedItems").add(item!!)
         }
@@ -122,8 +122,8 @@ class LoginAndSignupViewModel : ViewModel(){
             Log.w("UerID", "Error!")
         }
 
-        var storage = Firebase.storage
-        var imageRef: StorageReference? = storage.reference.child("users").child(userID).child("${username.value}.jpg")
+        val storage = Firebase.storage
+        val imageRef: StorageReference? = storage.reference.child("users").child(userID).child("${username.value}.jpg")
         val baos = ByteArrayOutputStream()
         val bitmap = image.value
         bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, baos)

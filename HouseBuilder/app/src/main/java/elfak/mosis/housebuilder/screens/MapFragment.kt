@@ -1,5 +1,6 @@
 package elfak.mosis.housebuilder.screens
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
@@ -9,6 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -19,15 +21,22 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
+import com.firebase.geofire.GeoFireUtils
+import com.firebase.geofire.GeoLocation
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import elfak.mosis.housebuilder.R
 import elfak.mosis.housebuilder.helpers.CustomInfoWindow
 import elfak.mosis.housebuilder.models.LocationViewModel
+import elfak.mosis.housebuilder.models.data.Item
 import elfak.mosis.housebuilder.models.data.MarkerItem
+import elfak.mosis.housebuilder.models.data.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -49,6 +58,8 @@ class MapFragment : Fragment() {
     private lateinit var myLocationOverlay: MyLocationNewOverlay
     private var auth : FirebaseAuth = Firebase.auth
     private var db = Firebase.firestore
+    private lateinit var collectBtn: Button
+    private var names: ArrayList<String> = arrayListOf("concrete", "brick", "door", "window", "roof", "chimney")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,8 +94,11 @@ class MapFragment : Fragment() {
             setMyLoactionOverlay()
         }
 
+        val startPoint: GeoPoint = if (myLocationOverlay.myLocation == null)
+            GeoPoint(43.3209, 21.8958)
+        else
+            GeoPoint(myLocationOverlay.myLocation.latitude, myLocationOverlay.myLocation.longitude)
         map.controller.setZoom(15.0)
-        val startPoint = GeoPoint(43.3209, 21.8958)
         map.controller.setCenter(startPoint)
 
         val mRotationGestureOverlay = RotationGestureOverlay(context, map)
@@ -92,7 +106,7 @@ class MapFragment : Fragment() {
         map.setMultiTouchControls(true)
         map.overlays.add(mRotationGestureOverlay)
 
-        val fab: FloatingActionButton = requireView().findViewById<FloatingActionButton>(R.id.fab_add)
+        val fab: FloatingActionButton = requireView().findViewById(R.id.fab_add)
         fab.setOnClickListener{addItem()}
 
         val nameObserver = Observer<String> { newValue ->
@@ -106,7 +120,7 @@ class MapFragment : Fragment() {
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 map.overlays.add(marker)
                 marker.title = locationViewModel.itemName.value
-                marker.snippet = locationViewModel.points.toString() + " points"
+                marker.snippet = "${locationViewModel.points.value} points"
                 marker.icon = ResourcesCompat.getDrawable(resources, R.drawable.marker_icon, null)
 
                 var drawableImage: Int? = null
@@ -121,16 +135,31 @@ class MapFragment : Fragment() {
                 val image: Drawable? = ResourcesCompat.getDrawable(resources, drawableImage!!, null)
                 marker.image = image
 
-                marker.setInfoWindow(CustomInfoWindow(map))
+                marker.infoWindow = CustomInfoWindow(map)
+
+                collectBtn  = marker.infoWindow.view.findViewById(R.id.bubble_moreinfo)
+                collectBtn.visibility = View.GONE
+
+                val hash = GeoFireUtils.getGeoHashForLocation(
+                    GeoLocation(
+                        locationViewModel.latitude.value!!.toDouble(),
+                        locationViewModel.longitude.value!!.toDouble()))
 
                 val m = MarkerItem(locationViewModel.itemName.value,
                     locationViewModel.longitude.value,
                     locationViewModel.latitude.value,
                     auth.currentUser?.email,
                     locationViewModel.points.value,
-                    LocalDateTime.now().toString())
+                    LocalDateTime.now().toString(),
+                    hash)
 
                 db.collection("markers").add(m)
+                    .addOnSuccessListener {
+                        Toast.makeText(view.context, "Successfully posted!", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener{
+                        Toast.makeText(view.context, "Failed!", Toast.LENGTH_SHORT).show()
+                    }
                 locationViewModel.setItemName("no")
             }
         }
@@ -169,8 +198,13 @@ class MapFragment : Fragment() {
                         val image: Drawable? = ResourcesCompat.getDrawable(resources, drawableImage!!, null)
                         marker.image = image
 
-                        marker.setInfoWindow(CustomInfoWindow(map))
-                       // Log.d("MARKER", marker.toString())
+                        marker.infoWindow = CustomInfoWindow(map)
+
+                        collectBtn  = marker.infoWindow.view.findViewById(R.id.bubble_moreinfo)
+                        if(d.get("user").toString() == auth.currentUser?.email){
+                            collectBtn.visibility = View.GONE
+                        }
+                        collectBtn.setOnClickListener{collectItem(d, marker)}
                     }
                 }
             }
@@ -178,6 +212,118 @@ class MapFragment : Fragment() {
                 Log.w("MARKER", "ERROR", e)
             }
         }
+    }
+
+    @SuppressLint("SuspiciousIndentation")
+    private fun collectItem(item: DocumentSnapshot, marker: Marker){
+
+        val myLoc =  GeoLocation(myLocationOverlay.myLocation.latitude, myLocationOverlay.myLocation.longitude)
+        val itemLat = item.get("latitude").toString().toDouble()
+        val itemLong = item.get("longitude").toString().toDouble()
+        val itemLoc = GeoLocation(itemLat, itemLong)
+        val radius = 3.0
+        val distance = GeoFireUtils.getDistanceBetween(itemLoc, myLoc)
+
+        if(distance <= radius){
+
+            val itemId = item.id
+            val itemPoints = item.get("points").toString().toInt()
+            val item1 = Item(item.get("name").toString(),
+                item.get("points").toString().toInt(),
+                item.get("longitude").toString(),
+                item.get("latitude").toString(),
+                auth.currentUser?.uid)
+
+            db.collection("markers").document(itemId).delete()
+                .addOnSuccessListener { Log.d("MARKER", "Successfully deleted from markers") }
+                .addOnFailureListener{ Log.d("MARKER", "Failed to delete in markers") }
+
+            db.collection("collectedItems").add(item1)
+                .addOnSuccessListener { Log.d("MARKER", "Success writing into collectedItems") }
+                .addOnFailureListener{ Log.d("MARKER", "Fail writing into collectedItems") }
+
+            var houseNumber = 0
+            val userID: String = auth.currentUser?.uid ?: ""
+            viewLifecycleOwner.lifecycleScope.launch {
+                try {
+                    val result = withContext(Dispatchers.IO) {
+                        db.collection("collectedItems")
+                            .whereEqualTo("userID", userID)
+                            .get()
+                            .await()
+                    }
+
+                    var concreteNumber = 0
+                    var brickNumber = 0
+                    var roofNumber = 0
+                    var doorNumber = 0
+                    var windowNumber = 0
+                    var chimneyNumber = 0
+
+                    if(result != null){
+                        for(it in result.documents){
+                            if(it.get("name") == "concrete"){ concreteNumber += 1 }
+                            else if(it.get("name") == "brick"){ brickNumber += 1 }
+                            else if(it.get("name") == "roof"){ roofNumber += 1 }
+                            else if(it.get("name") == "door"){ doorNumber += 1 }
+                            else if(it.get("name") == "window"){ windowNumber += 1 }
+                            else if(it.get("name") == "chimney"){ chimneyNumber += 1 }
+                        }
+
+                        if(concreteNumber == 12 && brickNumber == 8 && roofNumber == 4
+                            && doorNumber == 1 && windowNumber == 4 && chimneyNumber == 1){
+                            houseNumber = 1
+                            var i: Item? = null
+                            for(j in 1..30){
+                                when(names.random()){
+                                    "concrete" -> i =  Item("concrete",5, null, null, userID)
+                                    "brick" -> i =  Item("brick",10, null, null, userID)
+                                    "door" -> i =  Item("door",20, null, null, userID)
+                                    "window" -> i =  Item("window",15, null, null, userID)
+                                    "roof" -> i =  Item("roof",15, null, null, userID)
+                                    "chimney" -> i =  Item("chimney",25, null, null, userID)
+                                }
+                                db.collection("receivedItems").add(i!!)
+                            }
+
+                            Toast.makeText(view?.context, "Congratulations, you've built a house!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                catch (e: Exception) {
+                    Log.w("ITEM", "ERROR", e)
+                }
+            }
+
+            var userPoints: Int? = 0
+            var userHouseNumber: Int? = 0
+            val database = Firebase.database("https://house-builder-7dd6e-default-rtdb.firebaseio.com/")
+                .reference.child("users").child(userID)
+
+                database.get()
+                .addOnSuccessListener { result ->
+                    val user = result.getValue<User>()
+                    userPoints = user?.points?.plus(itemPoints)
+                    userHouseNumber = user?.houseNumber?.plus(houseNumber)
+                    database.child("points").setValue(userPoints)
+                    database.child("houseNumber").setValue(userHouseNumber)
+                }
+                    .addOnFailureListener{
+                    Log.d("USER", "Fail to update!") }
+
+            Toast.makeText(view?.context, "Collected!", Toast.LENGTH_SHORT).show()
+            marker.closeInfoWindow()
+            map.overlays.remove(marker)
+        }
+        else{
+            Toast.makeText(view?.context, "You need to get closer!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun removeAllMarkers() {
+        val markers = map.overlays.filterIsInstance<Marker>().toMutableList()
+        markers.forEach { m -> map.overlays.remove(m) }
+        map.invalidate()
     }
 
     private fun addItem(){
