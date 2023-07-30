@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_map -> navController.navigate(R.id.MapFragment)
             R.id.nav_editProfile -> navController.navigate(R.id.EditProfileFragment)
             R.id.nav_collectedItems -> navController.navigate(R.id.CollectedItemsFragment)
+            R.id.nav_leaderboard -> navController.navigate(R.id.LeaderBoardFragment)
             R.id.nav_logout -> {
                 auth.signOut()
                 val i: Intent = Intent(this, LoginAndSignupActivity::class.java)

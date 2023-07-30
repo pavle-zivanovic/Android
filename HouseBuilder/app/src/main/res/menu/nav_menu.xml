@@ -26,6 +26,11 @@
             android:icon="@drawable/baseline_collections"
             android:title="@string/collected_items"/>
 
+        <item
+            android:id="@+id/nav_leaderboard"
+            android:icon="@drawable/baseline_leaderboard"
+            android:title="@string/leaderboard"/>
+
     </group>
 
     <item

@@ -32,4 +32,8 @@
     <string name="button_change_password">Change password</string>
     <string name="add_item">Add item</string>
     <string name="collected_items">Collected items</string>
+    <string name="leaderboard">Leaderboard</string>
+    <string name="username_leaderboard">Username</string>
+    <string name="house_number_leaderboard">Houses</string>
+    <string name="points_leaderboard">Points</string>
 </resources>

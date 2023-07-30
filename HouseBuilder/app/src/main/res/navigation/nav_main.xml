@@ -48,4 +48,11 @@
         tools:layout="@layout/fragment_collected_items">
     </fragment>
 
+    <fragment
+        android:id="@+id/LeaderBoardFragment"
+        android:name="elfak.mosis.housebuilder.screens.LeaderBoardFragment"
+        android:label="fragment_leader_board"
+        tools:layout="@layout/fragment_leader_board">
+    </fragment>
+
 </navigation>
