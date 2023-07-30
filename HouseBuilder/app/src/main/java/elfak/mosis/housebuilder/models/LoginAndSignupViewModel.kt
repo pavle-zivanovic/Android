@@ -148,7 +148,8 @@ class LoginAndSignupViewModel : ViewModel(){
             if(task.isSuccessful){
                 chooseItems(userID)
                 val imageUrl = task.result.toString()
-                val user = User(username.value, password.value, firstname.value, lastname.value, phone.value, imageUrl, 0, 0)
+                val user = User(username.value, password.value, firstname.value, lastname.value, phone.value, imageUrl, 0, 0, 100,
+                0, 0, 0, 0, 0, 0)
                 val database = Firebase.database("https://house-builder-7dd6e-default-rtdb.firebaseio.com/")
                 database.reference.child("users").child(userID).setValue(user)
             }

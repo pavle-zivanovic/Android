@@ -221,7 +221,7 @@ class MapFragment : Fragment() {
         val itemLat = item.get("latitude").toString().toDouble()
         val itemLong = item.get("longitude").toString().toDouble()
         val itemLoc = GeoLocation(itemLat, itemLong)
-        val radius = 3.0
+        val radius = 2.0
         val distance = GeoFireUtils.getDistanceBetween(itemLoc, myLoc)
 
         if(distance <= radius){
@@ -285,6 +285,132 @@ class MapFragment : Fragment() {
                                 }
                                 db.collection("receivedItems").add(i!!)
                             }
+                            val database = Firebase.database("https://house-builder-7dd6e-default-rtdb.firebaseio.com/")
+                                .reference.child("users").child(userID)
+
+                            database.get()
+                                .addOnSuccessListener { result ->
+                                    val user = result.getValue<User>()
+                                    val userItems = user?.items?.plus(30)
+                                    database.child("items").setValue(userItems)
+                                    val concreteItems = user?.concreteNumber?.minus(12)
+                                    database.child("concreteNumber").setValue(concreteItems)
+                                    val brickItems = user?.brickNumber?.minus(8)
+                                    database.child("brickNumber").setValue(brickItems)
+                                    val roofItems = user?.roofNumber?.minus(4)
+                                    database.child("roofNumber").setValue(roofItems)
+                                    val doorItems = user?.doorNumber?.minus(1)
+                                    database.child("doorNumber").setValue(doorItems)
+                                    val windowItems = user?.windowNumber?.minus(4)
+                                    database.child("windowNumber").setValue(windowItems)
+                                    val chimneyItems = user?.chimneyNumber?.minus(1)
+                                    database.child("chimneyNumber").setValue(chimneyItems)
+                                }
+                                .addOnFailureListener{
+                                    Log.d("USER", "Fail to update!") }
+
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                try {
+                                    val concretes = withContext(Dispatchers.IO) {
+                                        db.collection("collectedItems")
+                                            .whereEqualTo("userID", userID)
+                                            .whereEqualTo("name", "concrete")
+                                            .limit(12).get().await()
+                                    }
+                                    if(concretes != null){
+                                        for(c in concretes.documents){
+                                            db.collection("collectedItems").document(c.id).delete()
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    Log.w("ITEM", "ERROR", e)
+                                }
+                            }
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                try {
+                                    val bricks = withContext(Dispatchers.IO) {
+                                        db.collection("collectedItems")
+                                            .whereEqualTo("userID", userID)
+                                            .whereEqualTo("name", "brick")
+                                            .limit(8).get().await()
+                                    }
+                                    if(bricks != null){
+                                        for(b in bricks.documents){
+                                            db.collection("collectedItems").document(b.id).delete()
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    Log.w("ITEM", "ERROR", e)
+                                }
+                            }
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                try {
+                                    val roofs = withContext(Dispatchers.IO) {
+                                        db.collection("collectedItems")
+                                            .whereEqualTo("userID", userID)
+                                            .whereEqualTo("name", "roof")
+                                            .limit(4).get().await()
+                                    }
+                                    if(roofs != null){
+                                        for(r in roofs.documents){
+                                            db.collection("collectedItems").document(r.id).delete()
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    Log.w("ITEM", "ERROR", e)
+                                }
+                            }
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                try {
+                                    val doors = withContext(Dispatchers.IO) {
+                                        db.collection("collectedItems")
+                                            .whereEqualTo("userID", userID)
+                                            .whereEqualTo("name", "door")
+                                            .limit(1).get().await()
+                                    }
+                                    if(doors != null){
+                                        for(d in doors.documents){
+                                            db.collection("collectedItems").document(d.id).delete()
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    Log.w("ITEM", "ERROR", e)
+                                }
+                            }
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                try {
+                                    val windows = withContext(Dispatchers.IO) {
+                                        db.collection("collectedItems")
+                                            .whereEqualTo("userID", userID)
+                                            .whereEqualTo("name", "window")
+                                            .limit(4).get().await()
+                                    }
+                                    if(windows != null){
+                                        for(w in windows.documents){
+                                            db.collection("collectedItems").document(w.id).delete()
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    Log.w("ITEM", "ERROR", e)
+                                }
+                            }
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                try {
+                                    val chimneys = withContext(Dispatchers.IO) {
+                                        db.collection("collectedItems")
+                                            .whereEqualTo("userID", userID)
+                                            .whereEqualTo("name", "chimney")
+                                            .limit(1).get().await()
+                                    }
+                                    if(chimneys != null){
+                                        for(ch in chimneys.documents){
+                                            db.collection("collectedItems").document(ch.id).delete()
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    Log.w("ITEM", "ERROR", e)
+                                }
+                            }
 
                             Toast.makeText(view?.context, "Congratulations, you've built a house!", Toast.LENGTH_SHORT).show()
                         }
@@ -295,8 +421,9 @@ class MapFragment : Fragment() {
                 }
             }
 
-            var userPoints: Int? = 0
-            var userHouseNumber: Int? = 0
+            var userPoints: Int?
+            var userHouseNumber: Int?
+            var itemNumber: Int?
             val database = Firebase.database("https://house-builder-7dd6e-default-rtdb.firebaseio.com/")
                 .reference.child("users").child(userID)
 
@@ -307,6 +434,33 @@ class MapFragment : Fragment() {
                     userHouseNumber = user?.houseNumber?.plus(houseNumber)
                     database.child("points").setValue(userPoints)
                     database.child("houseNumber").setValue(userHouseNumber)
+
+                    when(item.get("name").toString()){
+                        "concrete" -> {
+                            itemNumber = user?.concreteNumber?.plus(1)
+                            database.child("concreteNumber").setValue(itemNumber)
+                        }
+                        "brick" -> {
+                            itemNumber = user?.brickNumber?.plus(1)
+                            database.child("brickNumber").setValue(itemNumber)
+                        }
+                        "door" -> {
+                            itemNumber = user?.doorNumber?.plus(1)
+                            database.child("doorNumber").setValue(itemNumber)
+                        }
+                        "window" -> {
+                            itemNumber = user?.windowNumber?.plus(1)
+                            database.child("windowNumber").setValue(itemNumber)
+                        }
+                        "roof" -> {
+                            itemNumber = user?.roofNumber?.plus(1)
+                            database.child("roofNumber").setValue(itemNumber)
+                        }
+                        "chimney" -> {
+                            itemNumber = user?.chimneyNumber?.plus(1)
+                            database.child("chimneyNumber").setValue(itemNumber)
+                        }
+                    }
                 }
                     .addOnFailureListener{
                     Log.d("USER", "Fail to update!") }

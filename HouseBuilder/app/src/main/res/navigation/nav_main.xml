@@ -41,4 +41,11 @@
         tools:layout="@layout/fragment_edit_profile">
     </fragment>
 
+    <fragment
+        android:id="@+id/CollectedItemsFragment"
+        android:name="elfak.mosis.housebuilder.screens.CollectedItemsFragment"
+        android:label="fragment_collected_items"
+        tools:layout="@layout/fragment_collected_items">
+    </fragment>
+
 </navigation>

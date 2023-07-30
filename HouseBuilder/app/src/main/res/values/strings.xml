@@ -31,4 +31,5 @@
     <string name="button_change_username">Change username</string>
     <string name="button_change_password">Change password</string>
     <string name="add_item">Add item</string>
+    <string name="collected_items">Collected items</string>
 </resources>

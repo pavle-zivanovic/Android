@@ -10,18 +10,28 @@ import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.firebase.geofire.GeoFireUtils
+import com.firebase.geofire.GeoLocation
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import elfak.mosis.housebuilder.R
 import elfak.mosis.housebuilder.models.LocationViewModel
 import elfak.mosis.housebuilder.models.data.Item
+import elfak.mosis.housebuilder.models.data.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -116,45 +126,95 @@ class AddFragment : DialogFragment() {
     }
 
     private fun postItem(){
-        val userID: String = auth.currentUser?.uid ?: ""
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val result = withContext(Dispatchers.IO) {
-                    db.collection("receivedItems")
-                        .whereEqualTo("userID", userID)
-                        .whereEqualTo("name", itemName)
-                        .get()
-                        .await()
-                }
+        val myLoc =  GeoLocation(
+            locationViewModel.latitude.value!!.toDouble(),
+            locationViewModel.longitude.value!!.toDouble())
+        val radius = 5.0
 
-                if(result != null){
-                    val itemId = result.documents[0].id
-                    val item = Item(result.documents[0].get("name").toString(),
-                        result.documents[0].get("points").toString().toInt(),
-                        result.documents[0].get("longitude").toString(),
-                        result.documents[0].get("latitude").toString(),
-                        result.documents[0].get("userID").toString())
-
-                    db.collection("receivedItems").document(itemId).delete()
-                        .addOnSuccessListener { Log.d("ITEM", "Successfully deleted from receivedItems") }
-                        .addOnFailureListener{ Log.d("ITEM", "Failed to delete in receivedItems") }
-
-                    item.longitude = locationViewModel.longitude.value
-                    item.latitude = locationViewModel.latitude.value
-
-                    db.collection("postedItems").add(item)
-                        .addOnSuccessListener { Log.d("ITEM", "Success writing into postedItems") }
-                        .addOnFailureListener{ Log.d("ITEM", "Fail writing into postedItems") }
-
-                    item.points?.let { locationViewModel.setPoints(it) }
-                    item.name?.let { locationViewModel.setItemName(it) }
-
-                    findNavController().navigate(R.id.MapFragment)
-                }
-            }
-            catch (e: Exception) {
-                Log.w("ITEM", "ERROR", e)
-            }
+        val bounds = GeoFireUtils.getGeoHashQueryBounds(myLoc, radius)
+        val tasks: MutableList<Task<QuerySnapshot>> = ArrayList()
+        for (b in bounds) {
+            val q = db.collection("markers")
+                .orderBy("hash")
+                .startAt(b.startHash)
+                .endAt(b.endHash)
+            tasks.add(q.get())
         }
+
+        Tasks.whenAllComplete(tasks)
+            .addOnCompleteListener {
+                val matchingDocs: MutableList<DocumentSnapshot> = ArrayList()
+                for (task in tasks) {
+                    val snap = task.result
+                    for (doc in snap!!.documents) {
+                        val lat = doc.get("latitude").toString().toDouble()
+                        val lng = doc.get("longitude").toString().toDouble()
+
+                        val docLocation = GeoLocation(lat, lng)
+                        val distanceInM = GeoFireUtils.getDistanceBetween(docLocation, myLoc)
+                        if (distanceInM <= radius) {
+                            matchingDocs.add(doc)
+                        }
+                    }
+                }
+
+                if(matchingDocs.isEmpty()){
+                    val userID: String = auth.currentUser?.uid ?: ""
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        try {
+                            val result = withContext(Dispatchers.IO) {
+                                db.collection("receivedItems")
+                                    .whereEqualTo("userID", userID)
+                                    .whereEqualTo("name", itemName)
+                                    .get()
+                                    .await()
+                            }
+
+                            if(result != null){
+                                val itemId = result.documents[0].id
+                                val item = Item(result.documents[0].get("name").toString(),
+                                    result.documents[0].get("points").toString().toInt(),
+                                    result.documents[0].get("longitude").toString(),
+                                    result.documents[0].get("latitude").toString(),
+                                    result.documents[0].get("userID").toString())
+
+                                db.collection("receivedItems").document(itemId).delete()
+                                    .addOnSuccessListener { Log.d("ITEM", "Successfully deleted from receivedItems") }
+                                    .addOnFailureListener{ Log.d("ITEM", "Failed to delete in receivedItems") }
+
+                                item.longitude = locationViewModel.longitude.value
+                                item.latitude = locationViewModel.latitude.value
+
+                                db.collection("postedItems").add(item)
+                                    .addOnSuccessListener { Log.d("ITEM", "Success writing into postedItems") }
+                                    .addOnFailureListener{ Log.d("ITEM", "Fail writing into postedItems") }
+
+                                item.points?.let { locationViewModel.setPoints(it) }
+                                item.name?.let { locationViewModel.setItemName(it) }
+
+                                val database = Firebase.database("https://house-builder-7dd6e-default-rtdb.firebaseio.com/")
+                                    .reference.child("users").child(userID)
+
+                                database.get()
+                                    .addOnSuccessListener { result ->
+                                        val user = result.getValue<User>()
+                                        val userItems = user?.items?.minus(1)
+                                        database.child("items").setValue(userItems)
+                                    }
+                                    .addOnFailureListener{
+                                        Log.d("USER", "Fail to update!") }
+
+                                findNavController().navigate(R.id.MapFragment)
+                            }
+                        }
+                        catch (e: Exception) {
+                            Log.w("ITEM", "ERROR", e)
+                        }
+                    }
+                }
+                else{
+                    Toast.makeText(view?.context, "There is already an item at that location!", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 }

@@ -17,7 +17,7 @@ import com.google.firebase.ktx.Firebase
 import elfak.mosis.housebuilder.R
 import elfak.mosis.housebuilder.models.data.User
 
-class HomeFragment : Fragment() {
+class CollectedItemsFragment : Fragment() {
 
     private lateinit var auth: FirebaseAuth
 
@@ -30,18 +30,19 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        return inflater.inflate(R.layout.fragment_collected_items, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         auth = Firebase.auth
-        val usernameText: TextView = requireView().findViewById(R.id.home_username_textView)
-        val pointsText: TextView = requireView().findViewById(R.id.home_points_textView)
-        val houseNumberText: TextView = requireView().findViewById(R.id.home_houseNumber_textView)
-        val itemsText: TextView = requireView().findViewById(R.id.home_received_textView)
-        usernameText.text = auth.currentUser?.email?.substringBefore("@")
+        val concreteText: TextView = requireView().findViewById(R.id.concreteNumber_textView)
+        val brickText: TextView = requireView().findViewById(R.id.brickNumber_textView)
+        val roofText: TextView = requireView().findViewById(R.id.roofNumber_textView)
+        val doorText: TextView = requireView().findViewById(R.id.doorNumber_textView)
+        val windowText: TextView = requireView().findViewById(R.id.windowNumber_textView)
+        val chimneyText: TextView = requireView().findViewById(R.id.chimneyNumber_textView)
 
         val database = Firebase.database("https://house-builder-7dd6e-default-rtdb.firebaseio.com/")
             .reference.child("users").child(auth.currentUser?.uid.toString())
@@ -49,12 +50,18 @@ class HomeFragment : Fragment() {
         val userListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val user = dataSnapshot.getValue<User>()
-                val pTxt = "Points: " + user?.points.toString()
-                val hnTxt = "Built houses: " + user?.houseNumber.toString()
-                val hrTxt = "Items for posting: " + user?.items.toString()
-                pointsText.text = pTxt
-                houseNumberText.text = hnTxt
-                itemsText.text = hrTxt
+                val cTxt = " Concrete: " + user?.concreteNumber.toString() + "/12"
+                val bTxt = " Brick: " + user?.brickNumber.toString() + "/8"
+                val rTxt = " Roof: " + user?.roofNumber.toString() + "/4"
+                val dTxt = " Door: " + user?.doorNumber.toString() + "/1"
+                val wTxt = " Window: " + user?.windowNumber.toString() + "/4"
+                val chTxt = " Chimney: " + user?.chimneyNumber.toString() + "/1"
+                concreteText.text = cTxt
+                brickText.text = bTxt
+                roofText.text = rTxt
+                doorText.text = dTxt
+                windowText.text = wTxt
+                chimneyText.text = chTxt
             }
             override fun onCancelled(error: DatabaseError) {}
         }
