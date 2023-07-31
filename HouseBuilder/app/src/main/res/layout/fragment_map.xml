@@ -32,6 +32,18 @@
             android:layout_margin="10dp"
             android:contentDescription="@string/fab_content_description" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:backgroundTint="#F79256"
+            android:contentDescription="@string/fab_content_description"
+            android:src="@drawable/baseline_filter"
+            app:backgroundTint="#F79256"
+            app:layout_constraintBottom_toBottomOf="@+id/map"
+            app:layout_constraintStart_toStartOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

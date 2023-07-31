@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#c1e8ff"
+    tools:context=".screens.FiltersFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RadioGroup
+            android:id="@+id/radiogroupMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="60dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <RadioButton
+                android:id="@+id/rbAuthor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:buttonTint="#f79256"
+                android:text="@string/author_rb" />
+
+            <RadioButton
+                android:id="@+id/rbType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:buttonTint="#f79256"
+                android:text="@string/type_rb" />
+
+            <RadioButton
+                android:id="@+id/rbRadius"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:buttonTint="#f79256"
+                android:text="@string/radius_rb" />
+
+            <RadioButton
+                android:id="@+id/rbPoints"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:buttonTint="#f79256"
+                android:layout_weight="1"
+                android:text="@string/points_rb" />
+
+            <RadioButton
+                android:id="@+id/rbDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:buttonTint="#f79256"
+                android:layout_weight="1"
+                android:text="@string/date_rb" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="140dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingLeft="38dp"
+            android:paddingRight="36dp"
+            android:showDividers="middle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.269">
+
+            <EditText
+                android:id="@+id/editText_search_author"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/custom_input"
+                android:hint="@string/author_search"
+                android:inputType="text"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:autofillHints="author" />
+            
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="40dp"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayoutSpinner"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/spinner_hint_search"
+                app:startIconTint="@color/white"
+                app:startIconTintMode="multiply">
+
+                <AutoCompleteTextView
+                    android:id="@+id/spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    tools:ignore="LabelFor">
+
+                </AutoCompleteTextView>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="40dp"/>
+
+            <EditText
+                android:id="@+id/editText_search_radius"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/custom_input"
+                android:hint="@string/radius_search"
+                android:inputType="number"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:autofillHints="radius" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="40dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cbx5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:text="@string/_5"
+                    android:buttonTint="#f79256"/>
+
+                <CheckBox
+                    android:id="@+id/cbx10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:text="@string/_10"
+                    android:buttonTint="#f79256"/>
+
+                <CheckBox
+                    android:id="@+id/cbx15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:text="@string/_15"
+                    android:buttonTint="#f79256"/>
+
+                <CheckBox
+                    android:id="@+id/cbx20"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:text="@string/_20"
+                    android:buttonTint="#f79256"/>
+
+                <CheckBox
+                    android:id="@+id/cbx25"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:text="@string/_25"
+                    android:buttonTint="#f79256"/>
+
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="40dp"/>
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="horizontal">
+
+               <Button
+                   android:id="@+id/button_from_date"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:background="@drawable/orange_button_color"
+                   android:text="@string/button_from_date" />
+
+               <Space
+                   android:layout_width="85dp"
+                   android:layout_height="match_parent" />
+
+               <Button
+                   android:id="@+id/button_to_date"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:background="@drawable/orange_button_color"
+                   android:text="@string/button_to_date" />
+
+           </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/editText_from_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:hint="@string/date"
+                    android:paddingStart="12dp"
+                    android:layout_weight="2"
+                    android:paddingEnd="12dp" />
+
+                <Space
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"/>
+
+                <TextView
+                    android:id="@+id/editText_to_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:hint="@string/date"
+                    android:layout_weight="2"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp" />
+
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="40dp"/>
+
+            <Button
+                android:id="@+id/button_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/orange_button_color"
+                android:text="@string/button_filter" />
+
+        </LinearLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

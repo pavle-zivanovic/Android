@@ -31,6 +31,11 @@
             android:icon="@drawable/baseline_leaderboard"
             android:title="@string/leaderboard"/>
 
+        <item
+            android:id="@+id/nav_itemstable"
+            android:icon="@drawable/baseline_table_rows"
+            android:title="@string/items_table"/>
+
     </group>
 
     <item

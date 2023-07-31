@@ -24,6 +24,7 @@
     <string name="dialog_name">Post item</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="spinner_hint">Item</string>
+    <string name="spinner_hint_search">Type</string>
     <string name="button_get_received_items">See items</string>
     <string name="nav_add_item">Add item</string>
     <string name="fab_content_description">add item</string>
@@ -36,4 +37,21 @@
     <string name="username_leaderboard">Username</string>
     <string name="house_number_leaderboard">Houses</string>
     <string name="points_leaderboard">Points</string>
+    <string name="items_table">Items on map</string>
+    <string name="author_rb">author</string>
+    <string name="type_rb">type</string>
+    <string name="radius_rb">radius</string>
+    <string name="points_rb">points</string>
+    <string name="date_rb">date</string>
+    <string name="author_search">Author</string>
+    <string name="radius_search">Radius</string>
+    <string name="button_filter">Filter</string>
+    <string name="button_from_date">from</string>
+    <string name="button_to_date">to</string>
+    <string name="date">date</string>
+    <string name="_5">5</string>
+    <string name="_10">10</string>
+    <string name="_15">15</string>
+    <string name="_20">20</string>
+    <string name="_25">25</string>
 </resources>

@@ -55,4 +55,18 @@
         tools:layout="@layout/fragment_leader_board">
     </fragment>
 
+    <fragment
+        android:id="@+id/ItemsTableFragment"
+        android:name="elfak.mosis.housebuilder.screens.ItemsTableFragment"
+        android:label="fragment_items_table"
+        tools:layout="@layout/fragment_items_table">
+    </fragment>
+
+    <fragment
+        android:id="@+id/FiltersFragment"
+        android:name="elfak.mosis.housebuilder.screens.FiltersFragment"
+        android:label="fragment_filters"
+        tools:layout="@layout/fragment_filters">
+    </fragment>
+
 </navigation>

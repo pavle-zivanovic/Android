@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.firebase.geofire.GeoFireUtils
 import com.firebase.geofire.GeoLocation
@@ -106,8 +107,10 @@ class MapFragment : Fragment() {
         map.setMultiTouchControls(true)
         map.overlays.add(mRotationGestureOverlay)
 
-        val fab: FloatingActionButton = requireView().findViewById(R.id.fab_add)
-        fab.setOnClickListener{addItem()}
+        val fabAdd: FloatingActionButton = requireView().findViewById(R.id.fab_add)
+        fabAdd.setOnClickListener{addItem()}
+        val fabFilter: FloatingActionButton = requireView().findViewById(R.id.fab_filter)
+        fabFilter.setOnClickListener{filterItem()}
 
         val nameObserver = Observer<String> { newValue ->
             if(newValue != "no"){
@@ -485,6 +488,17 @@ class MapFragment : Fragment() {
         if(loc != null){
             locationViewModel.setLocation(loc.longitude.toString(), loc.latitude.toString())
             AddFragment().show(childFragmentManager, "Add item dialog")
+        }
+        else{
+            Toast.makeText(view?.context, "Turn on location!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun filterItem(){
+        val loc = myLocationOverlay.myLocation
+        if(loc != null){
+            locationViewModel.setLocation(loc.longitude.toString(), loc.latitude.toString())
+            findNavController().navigate(R.id.FiltersFragment)
         }
         else{
             Toast.makeText(view?.context, "Turn on location!", Toast.LENGTH_SHORT).show()
