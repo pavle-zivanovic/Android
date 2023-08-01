@@ -70,8 +70,8 @@
             android:layout_marginTop="75dp"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:paddingLeft="38dp"
-            android:paddingRight="36dp"
+            android:paddingStart="38dp"
+            android:paddingEnd="36dp"
             android:showDividers="middle"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -90,7 +90,7 @@
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
                 android:autofillHints="author" />
-            
+
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="5dp"/>
@@ -109,6 +109,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="none"
+                    android:textColor="@color/black"
                     tools:ignore="LabelFor">
 
                 </AutoCompleteTextView>
@@ -197,14 +198,18 @@
                    android:background="@drawable/orange_button_color"
                    android:text="@string/button_from_date" />
 
-               <TextView
+               <EditText
                    android:id="@+id/editText_from_date"
                    android:layout_width="wrap_content"
                    android:layout_height="40dp"
                    android:hint="@string/date"
                    android:paddingStart="12dp"
+                   android:background="@android:color/transparent"
                    android:layout_weight="2"
-                   android:paddingEnd="12dp" />
+                   android:paddingEnd="12dp"
+                   android:autofillHints="date"
+                   android:textColor="@color/black"
+                   android:inputType="date" />
 
                <Space
                    android:layout_width="55dp"
@@ -217,14 +222,18 @@
                    android:background="@drawable/orange_button_color"
                    android:text="@string/button_to_date" />
 
-               <TextView
+               <EditText
                    android:id="@+id/editText_to_date"
                    android:layout_width="wrap_content"
                    android:layout_height="40dp"
                    android:hint="@string/date"
+                   android:background="@android:color/transparent"
                    android:layout_weight="2"
                    android:paddingStart="12dp"
-                   android:paddingEnd="12dp" />
+                   android:paddingEnd="12dp"
+                   android:autofillHints="date"
+                   android:textColor="@color/black"
+                   android:inputType="date" />
 
                <Button
                    android:id="@+id/button_filter"

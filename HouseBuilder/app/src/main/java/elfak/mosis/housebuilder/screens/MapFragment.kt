@@ -29,11 +29,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import elfak.mosis.housebuilder.R
 import elfak.mosis.housebuilder.helpers.CustomInfoWindow
+import elfak.mosis.housebuilder.models.FilterItemsViewModel
 import elfak.mosis.housebuilder.models.LocationViewModel
 import elfak.mosis.housebuilder.models.data.Item
 import elfak.mosis.housebuilder.models.data.MarkerItem
@@ -50,12 +50,13 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 class MapFragment : Fragment() {
 
     private lateinit var map: MapView
     private val locationViewModel: LocationViewModel by activityViewModels()
+    private val filterViewModel: FilterItemsViewModel by activityViewModels()
     private lateinit var myLocationOverlay: MyLocationNewOverlay
     private var auth : FirebaseAuth = Firebase.auth
     private var db = Firebase.firestore
@@ -78,7 +79,13 @@ class MapFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        getAllMarkers()
+        if(filterViewModel.flag.value != null){
+            getAllMarkers()
+        }
+        if(filterViewModel.items.value == null){
+            getAllMarkers()
+        }
+
         map = requireView().findViewById(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)
         val ctx: Context? = requireActivity().applicationContext
@@ -153,8 +160,9 @@ class MapFragment : Fragment() {
                     locationViewModel.latitude.value,
                     auth.currentUser?.email,
                     locationViewModel.points.value,
-                    LocalDateTime.now().toString(),
-                    hash)
+                    LocalDate.now().toString(),
+                    hash,
+                    null)
 
                 db.collection("markers").add(m)
                     .addOnSuccessListener {
@@ -167,6 +175,44 @@ class MapFragment : Fragment() {
             }
         }
         locationViewModel.itemName.observe(viewLifecycleOwner, nameObserver)
+
+        val itemsObserver = Observer<ArrayList<MarkerItem>> {newValue ->
+            if(newValue.isNotEmpty()){
+                removeAllMarkers()
+                for(m in filterViewModel.items.value!!){
+                    val marker = Marker(map)
+                    val point = m.latitude?.let { it1 -> m.longitude?.let { it2 -> GeoPoint(it1.toDouble(), it2.toDouble()) } }
+                    marker.position = point
+                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    map.overlays.add(marker)
+                    marker.title = m.name
+                    marker.snippet = "${m.points} points"
+                    marker.icon = ResourcesCompat.getDrawable(resources, R.drawable.marker_icon, null)
+
+                    var drawableImage: Int? = null
+                    when(m.name){
+                        "concrete" -> drawableImage = R.drawable.concrete
+                        "brick" -> drawableImage = R.drawable.brick
+                        "door" -> drawableImage = R.drawable.door
+                        "window" -> drawableImage = R.drawable.window
+                        "roof" -> drawableImage = R.drawable.roof
+                        "chimney" -> drawableImage = R.drawable.chimney
+                    }
+                    val image: Drawable? = ResourcesCompat.getDrawable(resources, drawableImage!!, null)
+                    marker.image = image
+
+                    marker.infoWindow = CustomInfoWindow(map)
+
+                    collectBtn  = marker.infoWindow.view.findViewById(R.id.bubble_moreinfo)
+                    if(m.user == auth.currentUser?.email){
+                        collectBtn.visibility = View.GONE
+                    }
+                    collectBtn.setOnClickListener{collectItem(m, marker)}
+                }
+                filterViewModel.setItems(ArrayList())
+            }
+        }
+        filterViewModel.items.observe(viewLifecycleOwner, itemsObserver)
     }
 
     private fun getAllMarkers(){
@@ -207,7 +253,10 @@ class MapFragment : Fragment() {
                         if(d.get("user").toString() == auth.currentUser?.email){
                             collectBtn.visibility = View.GONE
                         }
-                        collectBtn.setOnClickListener{collectItem(d, marker)}
+                        val m = MarkerItem(d.get("name").toString(), d.get("longitude").toString(),
+                            d.get("latitude").toString(), d.get("user").toString(), d.get("points").toString().toInt(),
+                            d.get("dateCreated").toString(), d.get("hash").toString(), d.id)
+                        collectBtn.setOnClickListener{collectItem(m, marker)}
                     }
                 }
             }
@@ -218,11 +267,11 @@ class MapFragment : Fragment() {
     }
 
     @SuppressLint("SuspiciousIndentation")
-    private fun collectItem(item: DocumentSnapshot, marker: Marker){
+    private fun collectItem(item: MarkerItem, marker: Marker){
 
         val myLoc =  GeoLocation(myLocationOverlay.myLocation.latitude, myLocationOverlay.myLocation.longitude)
-        val itemLat = item.get("latitude").toString().toDouble()
-        val itemLong = item.get("longitude").toString().toDouble()
+        val itemLat = item.latitude!!.toDouble()
+        val itemLong = item.longitude!!.toDouble()
         val itemLoc = GeoLocation(itemLat, itemLong)
         val radius = 2.0
         val distance = GeoFireUtils.getDistanceBetween(itemLoc, myLoc)
@@ -230,16 +279,18 @@ class MapFragment : Fragment() {
         if(distance <= radius){
 
             val itemId = item.id
-            val itemPoints = item.get("points").toString().toInt()
-            val item1 = Item(item.get("name").toString(),
-                item.get("points").toString().toInt(),
-                item.get("longitude").toString(),
-                item.get("latitude").toString(),
+            val itemPoints = item.points
+            val item1 = Item(item.name,
+                item.points,
+                item.longitude,
+                item.latitude,
                 auth.currentUser?.uid)
 
-            db.collection("markers").document(itemId).delete()
-                .addOnSuccessListener { Log.d("MARKER", "Successfully deleted from markers") }
-                .addOnFailureListener{ Log.d("MARKER", "Failed to delete in markers") }
+            if (itemId != null) {
+                db.collection("markers").document(itemId).delete()
+                    .addOnSuccessListener { Log.d("MARKER", "Successfully deleted from markers") }
+                    .addOnFailureListener{ Log.d("MARKER", "Failed to delete in markers") }
+            }
 
             db.collection("collectedItems").add(item1)
                 .addOnSuccessListener { Log.d("MARKER", "Success writing into collectedItems") }
@@ -433,12 +484,12 @@ class MapFragment : Fragment() {
                 database.get()
                 .addOnSuccessListener { result ->
                     val user = result.getValue<User>()
-                    userPoints = user?.points?.plus(itemPoints)
+                    userPoints = itemPoints?.let { user?.points?.plus(it) }
                     userHouseNumber = user?.houseNumber?.plus(houseNumber)
                     database.child("points").setValue(userPoints)
                     database.child("houseNumber").setValue(userHouseNumber)
 
-                    when(item.get("name").toString()){
+                    when(item.name){
                         "concrete" -> {
                             itemNumber = user?.concreteNumber?.plus(1)
                             database.child("concreteNumber").setValue(itemNumber)

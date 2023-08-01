@@ -2,6 +2,8 @@ package elfak.mosis.housebuilder.screens
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -45,6 +47,7 @@ class AddFragment : DialogFragment() {
     private var receivedItems: ArrayList<Item> = ArrayList()
     private var itemName: String = ""
     private val locationViewModel: LocationViewModel by activityViewModels()
+    private lateinit var postBtn: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,8 +65,9 @@ class AddFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         getReceivedItems()
 
-        val postBtn: Button = requireView().findViewById(R.id.button_post)
+        postBtn = requireView().findViewById(R.id.button_post)
         postBtn.setOnClickListener{postItem()}
+        postBtn.isEnabled = false
     }
 
     override fun onStart() {
@@ -103,6 +107,7 @@ class AddFragment : DialogFragment() {
                     names = names.distinct() as ArrayList<String>
 
                     val spinner: AutoCompleteTextView = requireView().findViewById(R.id.spinner)
+                    spinner.isEnabled = false
                     val adapter = ArrayAdapter(requireView().context, android.R.layout.simple_spinner_dropdown_item, names as List<Any?>)
                     spinner.setAdapter(adapter)
                     spinner.setOnItemClickListener { adapterview, view, i, l ->
@@ -117,6 +122,13 @@ class AddFragment : DialogFragment() {
                             "chimney" -> txtInputLayoutSpinner.setStartIconDrawable(R.drawable.baseline_chimney)
                         }
                     }
+                    spinner.addTextChangedListener(object: TextWatcher {
+                        override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {}
+                        override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {}
+                        override fun afterTextChanged(text: Editable?) {
+                            postBtn.isEnabled = text.toString() != ""
+                        }
+                    })
                 }
             }
             catch (e: Exception) {
