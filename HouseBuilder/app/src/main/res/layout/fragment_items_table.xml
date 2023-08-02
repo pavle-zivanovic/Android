@@ -3,7 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#c1e8ff"
     tools:context=".screens.ItemsTableFragment">
 
+    <ListView
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:id="@+id/listItems"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:layout_marginTop="45dp"
+        tools:listitem="@layout/itemlist_list_item"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="10.0sp"/>
 
 </FrameLayout>

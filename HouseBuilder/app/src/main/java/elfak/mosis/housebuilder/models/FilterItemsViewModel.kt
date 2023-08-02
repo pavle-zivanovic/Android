@@ -16,4 +16,8 @@ class FilterItemsViewModel: ViewModel() {
     fun setItems(items: ArrayList<MarkerItem>){
         _items.value = ArrayList(items)
     }
+
+    fun setFlag(f: String){
+        _flag.value = f
+    }
 }

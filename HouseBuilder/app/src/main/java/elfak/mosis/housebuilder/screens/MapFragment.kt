@@ -34,6 +34,7 @@ import com.google.firebase.ktx.Firebase
 import elfak.mosis.housebuilder.R
 import elfak.mosis.housebuilder.helpers.CustomInfoWindow
 import elfak.mosis.housebuilder.models.FilterItemsViewModel
+import elfak.mosis.housebuilder.models.ItemsListViewModel
 import elfak.mosis.housebuilder.models.LocationViewModel
 import elfak.mosis.housebuilder.models.data.Item
 import elfak.mosis.housebuilder.models.data.MarkerItem
@@ -57,6 +58,7 @@ class MapFragment : Fragment() {
     private lateinit var map: MapView
     private val locationViewModel: LocationViewModel by activityViewModels()
     private val filterViewModel: FilterItemsViewModel by activityViewModels()
+    private val itemsListViewModel: ItemsListViewModel by activityViewModels()
     private lateinit var myLocationOverlay: MyLocationNewOverlay
     private var auth : FirebaseAuth = Firebase.auth
     private var db = Firebase.firestore
@@ -79,7 +81,7 @@ class MapFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if(filterViewModel.flag.value != null){
+        if(filterViewModel.flag.value == "yes"){
             getAllMarkers()
         }
         if(filterViewModel.items.value == null){
@@ -106,8 +108,15 @@ class MapFragment : Fragment() {
             GeoPoint(43.3209, 21.8958)
         else
             GeoPoint(myLocationOverlay.myLocation.latitude, myLocationOverlay.myLocation.longitude)
-        map.controller.setZoom(15.0)
-        map.controller.setCenter(startPoint)
+
+        if(itemsListViewModel.flag.value == "yes"){
+            map.controller.setZoom(15.0)
+            map.controller.setCenter(startPoint)
+        }
+        if(itemsListViewModel.flag.value == null){
+            map.controller.setZoom(15.0)
+            map.controller.setCenter(startPoint)
+        }
 
         val mRotationGestureOverlay = RotationGestureOverlay(context, map)
         mRotationGestureOverlay.isEnabled = true
@@ -210,9 +219,24 @@ class MapFragment : Fragment() {
                     collectBtn.setOnClickListener{collectItem(m, marker)}
                 }
                 filterViewModel.setItems(ArrayList())
+                filterViewModel.setFlag("yes")
             }
         }
         filterViewModel.items.observe(viewLifecycleOwner, itemsObserver)
+
+        val listItemsTableObserver = Observer<String> { newValue ->
+            if(newValue != "no"){
+                val point = itemsListViewModel.latitude.value?.let { it1 ->
+                    itemsListViewModel.longitude.value?.let { it2 ->
+                        GeoPoint(it1.toDouble(), it2.toDouble()) } }
+
+                map.controller.setZoom(20.0)
+                map.controller.animateTo(point)
+                itemsListViewModel.setFlag("yes")
+                itemsListViewModel.setLatLong("no", "no")
+            }
+        }
+        itemsListViewModel.longitude.observe(viewLifecycleOwner, listItemsTableObserver)
     }
 
     private fun getAllMarkers(){

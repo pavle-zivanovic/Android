@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    android:id="@+id/cardItemList"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginVertical="10dp"
+    android:layout_marginHorizontal="10dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="8dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/listItems_image"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@mipmap/ic_launcher"
+            android:scaleType="centerCrop"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:id="@+id/listItems_name"
+            android:layout_width="70dp"
+            android:layout_height="30dp"
+            android:text="@string/name_listItems"
+            android:textStyle="bold"
+            android:textColor="#f79256"
+            android:textSize="11sp"
+            android:layout_marginTop="25dp"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/listItems_image"/>
+
+        <TextView
+            android:id="@+id/listItems_author"
+            android:layout_width="75dp"
+            android:layout_height="30dp"
+            android:text="@string/author_listItems"
+            android:textStyle="bold"
+            android:textColor="#f79256"
+            android:textSize="11sp"
+            android:layout_marginTop="25dp"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@id/listItems_name"/>
+
+        <TextView
+            android:id="@+id/listItems_points"
+            android:layout_width="45dp"
+            android:layout_height="30dp"
+            android:text="@string/points_leaderboard"
+            android:textStyle="bold"
+            android:textColor="#f79256"
+            android:textSize="11sp"
+            android:layout_marginTop="25dp"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@id/listItems_author"/>
+
+        <TextView
+            android:id="@+id/listItems_date"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:text="@string/dateCreated_listItems"
+            android:textStyle="bold"
+            android:textColor="#f79256"
+            android:textSize="11sp"
+            android:layout_marginTop="25dp"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@id/listItems_points"/>
+
+        <TextView
+            android:id="@+id/listItems_latitude"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/listItems_longitude"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/listItems_tmp"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

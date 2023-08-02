@@ -54,4 +54,7 @@
     <string name="_15">15</string>
     <string name="_20">20</string>
     <string name="_25">25</string>
+    <string name="name_listItems">Name</string>
+    <string name="author_listItems">Author</string>
+    <string name="dateCreated_listItems">Date</string>
 </resources>

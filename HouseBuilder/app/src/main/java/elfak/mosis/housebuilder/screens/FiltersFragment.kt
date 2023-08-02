@@ -310,6 +310,7 @@ class FiltersFragment : Fragment() {
                                 markers.add(marker)
                             }
                             filterViewModel.setItems(markers)
+                            filterViewModel.setFlag("no")
                             markers.clear()
                             findNavController().navigate(R.id.action_FiltersFragment_to_MapFragment)
                         }
@@ -336,6 +337,7 @@ class FiltersFragment : Fragment() {
                                 markers.add(marker)
                             }
                             filterViewModel.setItems(markers)
+                            filterViewModel.setFlag("no")
                             markers.clear()
                             findNavController().navigate(R.id.action_FiltersFragment_to_MapFragment)
                         }
@@ -385,6 +387,7 @@ class FiltersFragment : Fragment() {
                             markers.add(marker)
                         }
                         filterViewModel.setItems(markers)
+                        filterViewModel.setFlag("no")
                         markers.clear()
                         //Log.d("AUTHOR", filterViewModel.items.value.toString())
                         findNavController().navigate(R.id.action_FiltersFragment_to_MapFragment)
@@ -408,6 +411,7 @@ class FiltersFragment : Fragment() {
                                 markers.add(marker)
                             }
                             filterViewModel.setItems(markers)
+                            filterViewModel.setFlag("no")
                             markers.clear()
                             findNavController().navigate(R.id.action_FiltersFragment_to_MapFragment)
                         }
@@ -435,6 +439,7 @@ class FiltersFragment : Fragment() {
                                 markers.add(marker)
                             }
                             filterViewModel.setItems(markers)
+                            filterViewModel.setFlag("no")
                             Log.d("AUTHOR", markers.toString())
                             markers.clear()
                             findNavController().navigate(R.id.action_FiltersFragment_to_MapFragment)
@@ -445,7 +450,6 @@ class FiltersFragment : Fragment() {
                 }
             }
         }
-        //Log.d("AUTHOR", filterViewModel.items.value.toString())
     }
 
     fun String.toEditable(): Editable =  Editable.Factory.getInstance().newEditable(this)

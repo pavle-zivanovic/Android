@@ -60,6 +60,10 @@
         android:name="elfak.mosis.housebuilder.screens.ItemsTableFragment"
         android:label="fragment_items_table"
         tools:layout="@layout/fragment_items_table">
+        <action
+            android:id="@+id/action_ItemsTableFragment_to_MapFragment"
+            app:destination="@+id/MapFragment">
+        </action>
     </fragment>
 
     <fragment
