@@ -216,7 +216,7 @@ class AddFragment : DialogFragment() {
                                     .addOnFailureListener{
                                         Log.d("USER", "Fail to update!") }
 
-                                findNavController().navigate(R.id.MapFragment)
+                                findNavController().navigate(R.id.action_AddFragment_to_MapFragment)
                             }
                         }
                         catch (e: Exception) {

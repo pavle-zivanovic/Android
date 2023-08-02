@@ -38,7 +38,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.text.ParseException
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class FiltersFragment : Fragment() {
 
@@ -421,12 +426,38 @@ class FiltersFragment : Fragment() {
                 }
             }
             "date" -> {
+                val dates = ArrayList<String>()
+                val input = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                var date1: Date? = null
+                var date2:Date? = null
+                try
+                {
+                    date1 = input.parse(valuesDate[0])
+                    date2 = input.parse(valuesDate[1])
+                }
+                catch (e: ParseException) {
+                    e.printStackTrace()
+                }
+                val cal1 = Calendar.getInstance()
+                if (date1 != null) {
+                    cal1.time = date1
+                }
+                val cal2 = Calendar.getInstance()
+                if (date2 != null) {
+                    cal2.time = date2
+                }
+                while (!cal1.after(cal2))
+                {
+                    val output = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    dates.add(output.format(cal1.time))
+                    cal1.add(Calendar.DATE, 1)
+                }
+
                 viewLifecycleOwner.lifecycleScope.launch {
                     try {
                         val result = withContext(Dispatchers.IO) {
                             db.collection("markers")
-                                .whereGreaterThanOrEqualTo("dateCreated", valuesDate[0])
-                                .whereLessThanOrEqualTo("dateCreated", valuesDate[1])
+                                .whereIn("dateCreated", dates)
                                 .get()
                                 .await()
                         }
@@ -440,7 +471,6 @@ class FiltersFragment : Fragment() {
                             }
                             filterViewModel.setItems(markers)
                             filterViewModel.setFlag("no")
-                            Log.d("AUTHOR", markers.toString())
                             markers.clear()
                             findNavController().navigate(R.id.action_FiltersFragment_to_MapFragment)
                         }

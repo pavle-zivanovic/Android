@@ -573,7 +573,7 @@ class MapFragment : Fragment() {
         val loc = myLocationOverlay.myLocation
         if(loc != null){
             locationViewModel.setLocation(loc.longitude.toString(), loc.latitude.toString())
-            findNavController().navigate(R.id.FiltersFragment)
+            findNavController().navigate(R.id.action_MapFragment_to_FiltersFragment)
         }
         else{
             Toast.makeText(view?.context, "Turn on location!", Toast.LENGTH_SHORT).show()

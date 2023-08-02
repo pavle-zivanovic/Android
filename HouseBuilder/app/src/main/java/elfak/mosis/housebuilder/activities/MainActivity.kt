@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var auth : FirebaseAuth
     private lateinit var navController: NavController
+    private lateinit var toggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +29,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         auth = Firebase.auth
 
         navController = findNavController(R.id.nav_host_fragment_content_loginandsignup)
-        drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
+        drawerLayout = findViewById(R.id.drawer_layout)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -36,19 +37,37 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
 
-        val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav, R.string.close_nav)
+        toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav, R.string.close_nav)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.nav_home -> navController.navigate(R.id.HomeFragment)
-            R.id.nav_map -> navController.navigate(R.id.MapFragment)
-            R.id.nav_editProfile -> navController.navigate(R.id.EditProfileFragment)
-            R.id.nav_collectedItems -> navController.navigate(R.id.CollectedItemsFragment)
-            R.id.nav_leaderboard -> navController.navigate(R.id.LeaderBoardFragment)
-            R.id.nav_itemstable -> navController.navigate(R.id.ItemsTableFragment)
+            R.id.nav_home -> {
+                navController.popBackStack()
+                navController.navigate(R.id.HomeFragment)
+            }
+            R.id.nav_map -> {
+                navController.popBackStack()
+                navController.navigate(R.id.MapFragment)
+            }
+            R.id.nav_editProfile -> {
+                navController.popBackStack()
+                navController.navigate(R.id.EditProfileFragment)
+            }
+            R.id.nav_collectedItems -> {
+                navController.popBackStack()
+                navController.navigate(R.id.CollectedItemsFragment)
+            }
+            R.id.nav_leaderboard -> {
+                navController.popBackStack()
+                navController.navigate(R.id.LeaderBoardFragment)
+            }
+            R.id.nav_itemstable -> {
+                navController.popBackStack()
+                navController.navigate(R.id.ItemsTableFragment)
+            }
             R.id.nav_logout -> {
                 auth.signOut()
                 val i: Intent = Intent(this, LoginAndSignupActivity::class.java)
@@ -59,7 +78,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
-
+    
     override fun onBackPressed() {
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
             drawerLayout.closeDrawer(GravityCompat.START)

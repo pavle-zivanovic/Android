@@ -57,4 +57,14 @@
     <string name="name_listItems">Name</string>
     <string name="author_listItems">Author</string>
     <string name="dateCreated_listItems">Date</string>
+    <string name="username_homeFragment">Username</string>
+    <string name="points_homeFragment">Points</string>
+    <string name="built_houses_homeFragment">Built houses</string>
+    <string name="items_for_posting_homeFragment">Items for posting</string>
+    <string name="concrete_0_12_collectedItemsFragment"> Concrete: 0/12</string>
+    <string name="brick_0_8_collectedItemsFragment"> Brick: 0/8</string>
+    <string name="roof_0_4_collectedItemsFragment"> Roof: 0/4</string>
+    <string name="door_0_1_collectedItemsFragment"> Door: 0/1</string>
+    <string name="window_0_4_collectedItemsFragment"> Window: 0/4</string>
+    <string name="chimney_0_1_collectedItemsFragment"> Chimney: 0/1</string>
 </resources>
