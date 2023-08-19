@@ -60,7 +60,7 @@ class LeaderBoardFragment : Fragment() {
                     usersArrayList += listOf(userList)
                 }
 
-                usersArrayList.sortWith(compareBy({it.houseNumber}, {it.points}))
+                usersArrayList.sortWith(compareBy({it.houseNumber?.toInt()}, {it.points?.toInt()}))
                 usersArrayList.reverse()
                 arrayListWithHeader += usersArrayList
                 val listAdapter = ListUsersAdapter(view.context, arrayListWithHeader)

@@ -33,6 +33,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import elfak.mosis.housebuilder.R
 import elfak.mosis.housebuilder.helpers.CustomInfoWindow
+import elfak.mosis.housebuilder.models.CurrentLocationViewModel
 import elfak.mosis.housebuilder.models.FilterItemsViewModel
 import elfak.mosis.housebuilder.models.ItemsListViewModel
 import elfak.mosis.housebuilder.models.LocationViewModel
@@ -59,6 +60,7 @@ class MapFragment : Fragment() {
     private val locationViewModel: LocationViewModel by activityViewModels()
     private val filterViewModel: FilterItemsViewModel by activityViewModels()
     private val itemsListViewModel: ItemsListViewModel by activityViewModels()
+    private val curLocationViewModel: CurrentLocationViewModel by activityViewModels()
     private lateinit var myLocationOverlay: MyLocationNewOverlay
     private var auth : FirebaseAuth = Firebase.auth
     private var db = Firebase.firestore
@@ -127,6 +129,13 @@ class MapFragment : Fragment() {
         fabAdd.setOnClickListener{addItem()}
         val fabFilter: FloatingActionButton = requireView().findViewById(R.id.fab_filter)
         fabFilter.setOnClickListener{filterItem()}
+
+        /*val locObserver = Observer<String> {
+            val p = GeoPoint(myLocationOverlay.myLocation.latitude, myLocationOverlay.myLocation.longitude)
+            map.controller.setZoom(20.0)
+            map.controller.setCenter(p)
+        }
+        curLocationViewModel.latitude.observe(viewLifecycleOwner, locObserver)*/
 
         val nameObserver = Observer<String> { newValue ->
             if(newValue != "no"){
@@ -282,6 +291,9 @@ class MapFragment : Fragment() {
                             d.get("dateCreated").toString(), d.get("hash").toString(), d.id)
                         collectBtn.setOnClickListener{collectItem(m, marker)}
                     }
+                    Log.d("PAVLE", myLocationOverlay.myLocation.latitude.toString())
+                    curLocationViewModel.setLocation(myLocationOverlay.myLocation.longitude.toString(),
+                        myLocationOverlay.myLocation.latitude.toString())
                 }
             }
             catch (e: Exception) {
@@ -297,8 +309,10 @@ class MapFragment : Fragment() {
         val itemLat = item.latitude!!.toDouble()
         val itemLong = item.longitude!!.toDouble()
         val itemLoc = GeoLocation(itemLat, itemLong)
-        val radius = 2.0
+        val radius = 3.0
         val distance = GeoFireUtils.getDistanceBetween(itemLoc, myLoc)
+
+        Log.d("DISTANCE", distance.toString())
 
         if(distance <= radius){
 
@@ -320,7 +334,6 @@ class MapFragment : Fragment() {
                 .addOnSuccessListener { Log.d("MARKER", "Success writing into collectedItems") }
                 .addOnFailureListener{ Log.d("MARKER", "Fail writing into collectedItems") }
 
-            var houseNumber = 0
             val userID: String = auth.currentUser?.uid ?: ""
             viewLifecycleOwner.lifecycleScope.launch {
                 try {
@@ -348,9 +361,8 @@ class MapFragment : Fragment() {
                             else if(it.get("name") == "chimney"){ chimneyNumber += 1 }
                         }
 
-                        if(concreteNumber == 12 && brickNumber == 8 && roofNumber == 4
-                            && doorNumber == 1 && windowNumber == 4 && chimneyNumber == 1){
-                            houseNumber = 1
+                        if(concreteNumber >= 12 && brickNumber >= 8 && roofNumber >= 4
+                            && doorNumber >= 1 && windowNumber >= 4 && chimneyNumber >= 1){
                             var i: Item? = null
                             for(j in 1..30){
                                 when(names.random()){
@@ -383,6 +395,8 @@ class MapFragment : Fragment() {
                                     database.child("windowNumber").setValue(windowItems)
                                     val chimneyItems = user?.chimneyNumber?.minus(1)
                                     database.child("chimneyNumber").setValue(chimneyItems)
+                                    val userHouseNumber = user?.houseNumber?.plus(1)
+                                    database.child("houseNumber").setValue(userHouseNumber)
                                 }
                                 .addOnFailureListener{
                                     Log.d("USER", "Fail to update!") }
@@ -500,7 +514,6 @@ class MapFragment : Fragment() {
             }
 
             var userPoints: Int?
-            var userHouseNumber: Int?
             var itemNumber: Int?
             val database = Firebase.database("https://house-builder-7dd6e-default-rtdb.firebaseio.com/")
                 .reference.child("users").child(userID)
@@ -509,9 +522,7 @@ class MapFragment : Fragment() {
                 .addOnSuccessListener { result ->
                     val user = result.getValue<User>()
                     userPoints = itemPoints?.let { user?.points?.plus(it) }
-                    userHouseNumber = user?.houseNumber?.plus(houseNumber)
                     database.child("points").setValue(userPoints)
-                    database.child("houseNumber").setValue(userHouseNumber)
 
                     when(item.name){
                         "concrete" -> {

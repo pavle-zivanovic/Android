@@ -16,11 +16,4 @@ data class User(var username: String? = null,
                 var windowNumber: Int? = null,
                 var chimneyNumber: Int? = null
 ) {
-    fun addHouse(){
-        houseNumber?.inc()
-    }
-
-    fun addPoint(item: Item){
-        points = points!! + item.points!!
-    }
 }
